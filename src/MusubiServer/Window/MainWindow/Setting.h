@@ -23,13 +23,20 @@ public:
   // Get listen port
   inline uint16_t getPort() const { return port; };
 
-  // Get log level
+  // Get activation level
   inline ActivationLevel getActivationLevel() const {
     return activation_level;
   };
+
+  // Get log level
   inline spdlog::level::level_enum getLogLevel() const { return log_level; };
+
+  // Get user name
   inline QString getRegisteredUser() const { return registered_user; };
+
+  // Get language file path
   inline QString getLanguageFile() const { return language_file; };
+
   void updateGui();
   void reset();
   void retranslate();
