@@ -1,0 +1,14 @@
+# Xmake cache
+.xmake/
+build/
+
+# Visual Studio Code
+.vscode/
+
+client_data.json
+Musubi_*.log
+
+# MacOS Cache
+.DS_Store
+
+

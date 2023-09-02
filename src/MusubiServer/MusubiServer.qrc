@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/MusubiServer">
+        <file>Window/Control/File/ico/file.png</file>
+        <file>Window/Control/File/ico/folder.png</file>
+    </qresource>
+</RCC>

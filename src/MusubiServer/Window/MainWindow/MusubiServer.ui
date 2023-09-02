@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MusubiServerClass</class>
+ <widget class="QMainWindow" name="MusubiServerClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1364</width>
+    <height>855</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MusubiServer</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="client_view_box">
+      <property name="title">
+       <string>Clients</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <layout class="QVBoxLayout" name="client_layout"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1364</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSettings"/>
+    <addaction name="actionLicense"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuRemote_Screen">
+     <property name="title">
+      <string>Remote Screen</string>
+     </property>
+     <addaction name="actionRsNormal"/>
+     <addaction name="actionRsHidden"/>
+    </widget>
+    <addaction name="actionView_Process"/>
+    <addaction name="actionView_File"/>
+    <addaction name="actionKeyboard_Monitor"/>
+    <addaction name="actionView_Program"/>
+    <addaction name="menuRemote_Screen"/>
+   </widget>
+   <widget class="QMenu" name="menuControl">
+    <property name="title">
+     <string>Control</string>
+    </property>
+    <addaction name="actionUninstall"/>
+    <addaction name="actionReinitialize"/>
+   </widget>
+   <widget class="QMenu" name="menuGenerator">
+    <property name="title">
+     <string>Generator</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuControl"/>
+   <addaction name="menuGenerator"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionView_Process">
+   <property name="text">
+    <string>View Process</string>
+   </property>
+  </action>
+  <action name="actionUninstall">
+   <property name="text">
+    <string>Uninstall</string>
+   </property>
+  </action>
+  <action name="actionView_File">
+   <property name="text">
+    <string>View File</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionExecute_Command">
+   <property name="text">
+    <string>Execute Command</string>
+   </property>
+  </action>
+  <action name="actionGenerate_standard_payload">
+   <property name="text">
+    <string>Generate standard payload</string>
+   </property>
+  </action>
+  <action name="actionLicense">
+   <property name="text">
+    <string>License</string>
+   </property>
+  </action>
+  <action name="actionTask_SYSTEM">
+   <property name="text">
+    <string>Task (SYSTEM)</string>
+   </property>
+  </action>
+  <action name="actionTask_Current_User">
+   <property name="text">
+    <string>Task (Current User)</string>
+   </property>
+  </action>
+  <action name="actionRsNormal">
+   <property name="text">
+    <string>Normal</string>
+   </property>
+  </action>
+  <action name="actionRsHidden">
+   <property name="text">
+    <string>Hidden</string>
+   </property>
+  </action>
+  <action name="actionReinitialize">
+   <property name="text">
+    <string>Reinitialize</string>
+   </property>
+  </action>
+  <action name="actionGenerate_network_payload">
+   <property name="text">
+    <string>Generate network payload</string>
+   </property>
+  </action>
+  <action name="actionKeyboard_Monitor">
+   <property name="text">
+    <string>Keyboard Monitor</string>
+   </property>
+  </action>
+  <action name="actionGenerate_http_shellcode">
+   <property name="text">
+    <string>Generate http shellcode</string>
+   </property>
+  </action>
+  <action name="actionView_Program">
+   <property name="text">
+    <string>View Program</string>
+   </property>
+  </action>
+  <action name="actionGenerate_xor_shellcode">
+   <property name="text">
+    <string>Generate xor shellcode</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../../MusubiServer.qrc"/>
+ </resources>
+ <connections/>
+</ui>
