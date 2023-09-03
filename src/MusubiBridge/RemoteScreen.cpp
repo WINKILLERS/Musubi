@@ -109,33 +109,33 @@ void Packet::RequestSetKeyboard::parseJson(const std::string &buffer) {
 }
 
 std::string Packet::ResponseRemoteScreen::buildJson() const {
-  auto required_size = ZSTD_compressBound(screen.size());
+  auto required_size = ZSTD_compressBound(rect.screen.size());
 
   std::string buffer;
   buffer.resize(required_size + 4 * sizeof(uint32_t));
-  *((uint32_t *)buffer.data() + 0) = x;
-  *((uint32_t *)buffer.data() + 1) = y;
-  *((uint32_t *)buffer.data() + 2) = width;
-  *((uint32_t *)buffer.data() + 3) = height;
+  *((uint32_t *)buffer.data() + 0) = rect.x;
+  *((uint32_t *)buffer.data() + 1) = rect.y;
+  *((uint32_t *)buffer.data() + 2) = rect.width;
+  *((uint32_t *)buffer.data() + 3) = rect.height;
   auto actual_size =
       ZSTD_compress(buffer.data() + 4 * sizeof(uint32_t), required_size,
-                    screen.data(), screen.size(), compression_level);
+                    rect.screen.data(), rect.screen.size(), compress_level);
   buffer.resize(actual_size + 4 * sizeof(uint32_t));
 
   return buffer;
 }
 
 void Packet::ResponseRemoteScreen::parseJson(const std::string &buffer) {
-  x = *((uint32_t *)buffer.data() + 0);
-  y = *((uint32_t *)buffer.data() + 1);
-  width = *((uint32_t *)buffer.data() + 2);
-  height = *((uint32_t *)buffer.data() + 3);
+  rect.x = *((uint32_t *)buffer.data() + 0);
+  rect.y = *((uint32_t *)buffer.data() + 1);
+  rect.width = *((uint32_t *)buffer.data() + 2);
+  rect.height = *((uint32_t *)buffer.data() + 3);
   auto required_size =
       ZSTD_getFrameContentSize(buffer.data() + 4 * sizeof(uint32_t),
                                buffer.size() - 4 * sizeof(uint32_t));
-  screen.resize(required_size);
-  auto actual_size = ZSTD_decompress(screen.data(), required_size,
+  rect.screen.resize(required_size);
+  auto actual_size = ZSTD_decompress(rect.screen.data(), required_size,
                                      buffer.data() + 4 * sizeof(uint32_t),
                                      buffer.size() - 4 * sizeof(uint32_t));
-  screen.resize(actual_size);
+  rect.screen.resize(actual_size);
 }

@@ -16,9 +16,8 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::request_upload_file;
-  }
+  enum { PacketType = (uint32_t)Type::request_upload_file };
+  inline Type getType() const override final { return (Type)PacketType; }
 
   inline bool operator==(const RequestUploadFile &other) const {
     return remote_path == other.remote_path && content == other.content;
@@ -35,9 +34,8 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::response_upload_file;
-  }
+  enum { PacketType = (uint32_t)Type::response_upload_file };
+  inline Type getType() const override final { return (Type)PacketType; }
 
   inline bool operator==(const ResponseUploadFile &other) const {
     return error_code == other.error_code;

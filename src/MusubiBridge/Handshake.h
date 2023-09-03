@@ -74,9 +74,8 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::request_reinitialize;
-  }
+  enum { PacketType = (uint32_t)Type::request_reinitialize };
+  inline Type getType() const override final { return (Type)PacketType; }
 };
 
 class ResponseReinitialize : public AbstractPacket {
@@ -89,8 +88,7 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::response_reinitialize;
-  }
+  enum { PacketType = (uint32_t)Type::response_reinitialize };
+  inline Type getType() const override final { return (Type)PacketType; }
 };
 } // namespace Packet

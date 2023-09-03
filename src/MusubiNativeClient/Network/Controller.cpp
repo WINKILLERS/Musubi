@@ -6,7 +6,6 @@
 #include "Screen.h"
 #include "Util/Util.h"
 
-
 void Network::Controller::run() noexcept {
   performHandshake();
 

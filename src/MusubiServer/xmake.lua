@@ -1,4 +1,4 @@
-add_requires("spdlog","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+add_requires("spdlog","qt6core","qt6network","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
 
 target("MusubiServer")
     add_rules("qt.widgetapp")
@@ -14,6 +14,6 @@ target("MusubiServer")
 
     add_includedirs("$(projectdir)/src/MusubiServer")
 
-    add_packages("spdlog","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+    add_packages("spdlog","qt6core","qt6network","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
     add_frameworks("QtNetwork","QtGui","QtCore")
     add_deps("MusubiBridge","MusubiActivator")

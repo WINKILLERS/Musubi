@@ -33,21 +33,25 @@ void Window::Control::ScreenDisplayer::paintEvent(QPaintEvent *ev) {
 }
 
 void Window::Control::ScreenDisplayer::mouseMoveEvent(QMouseEvent *ev) {
-  emit mouseMoved((double)ev->x() / width(), (double)ev->y() / height());
+  auto pos = ev->position();
+  emit mouseMoved((double)pos.x() / width(), (double)pos.y() / height());
 }
 
 void Window::Control::ScreenDisplayer::mousePressEvent(QMouseEvent *ev) {
-  emit mousePressed((double)ev->x() / width(), (double)ev->y() / height(),
+  auto pos = ev->position();
+  emit mousePressed((double)pos.x() / width(), (double)pos.y() / height(),
                     ev->button());
 }
 
 void Window::Control::ScreenDisplayer::mouseReleaseEvent(QMouseEvent *ev) {
-  emit mouseReleased((double)ev->x() / width(), (double)ev->y() / height(),
+  auto pos = ev->position();
+  emit mouseReleased((double)pos.x() / width(), (double)pos.y() / height(),
                      ev->button());
 }
 
 void Window::Control::ScreenDisplayer::mouseDoubleClickEvent(QMouseEvent *ev) {
-  emit mouseDoubleClicked((double)ev->x() / width(), (double)ev->y() / height(),
+  auto pos = ev->position();
+  emit mouseDoubleClicked((double)pos.x() / width(), (double)pos.y() / height(),
                           ev->button());
 }
 

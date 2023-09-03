@@ -4,7 +4,6 @@
 #include "InputChannel.h"
 #include "Window/Control/Screen/ViewScreen.h"
 
-
 Network::ScreenChannel::ScreenChannel(AbstractSession *session,
                                       AbstractChannel *parent)
     : AbstractMultiChannel(session, parent) {
@@ -70,8 +69,9 @@ bool Network::ScreenChannel::showWindow(QWidget *parent) {
 void Network::ScreenChannel::update(
     std::shared_ptr<Packet::Header> header,
     std::shared_ptr<Packet::ResponseRemoteScreen> packet) {
-  emit rectChanged(QRect(packet->x, packet->y, packet->width, packet->height),
-                   std::move(packet->screen));
+  emit rectChanged(QRect(packet->rect.x, packet->rect.y, packet->rect.width,
+                         packet->rect.height),
+                   std::move(packet->rect.screen));
 }
 
 void Network::ScreenChannel::onChannelConnected(Packet::Handshake::Role role,

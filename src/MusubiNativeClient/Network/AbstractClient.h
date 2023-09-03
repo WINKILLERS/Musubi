@@ -11,6 +11,7 @@ namespace Network {
 class AbstractClient {
 public:
   AbstractClient(const std::string &handshake_id);
+  AbstractClient(const std::string &handshake_id, Packet::Handshake::Role role);
   virtual ~AbstractClient();
 
   virtual void run() noexcept = 0;
@@ -65,18 +66,5 @@ AbstractClient::registerCallback(Packet::Type type, T_obj &obj,
                                  T_return (T_obj2::*func)(T_arg...)) {
   auto &signal = callbacks[type];
   return signal.connect(sigc::mem_fun(obj, func));
-}
-
-inline bool AbstractClient::invoke(
-    Packet::Type type, std::shared_ptr<Packet::Header> header,
-    std::shared_ptr<Packet::AbstractPacket> packet) const noexcept {
-  try {
-    auto &signal = callbacks.at(type);
-    return signal.emit(header, packet);
-  } catch (const std::exception &) {
-    spdlog::error("bug detected, unhandled request");
-    assert(false);
-    return false;
-  }
 }
 } // namespace Network

@@ -1,7 +1,6 @@
 #include "AbstractClient.h"
 #include "AApch.h"
 
-
 Network::AbstractClient::AbstractClient(const std::string &handshake_id)
     : handshake_id(handshake_id) {
   HW_PROFILE_INFOA hw_profile;
@@ -32,5 +31,17 @@ void Network::AbstractClient::dispatch(const Packet::Parser &parser) noexcept {
   try {
     invoke(parser.header->type, parser.header, parser.body);
   } catch (const std::exception &) {
+  }
+}
+
+bool Network::AbstractClient::invoke(
+    Packet::Type type, std::shared_ptr<Packet::Header> header,
+    std::shared_ptr<Packet::AbstractPacket> packet) const noexcept {
+  try {
+    auto &signal = callbacks.at(type);
+    return signal.emit(header, packet);
+  } catch (const std::exception &) {
+    assert(false);
+    return false;
   }
 }

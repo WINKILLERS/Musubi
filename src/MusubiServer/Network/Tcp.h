@@ -3,7 +3,6 @@
 #include "qtcpserver.h"
 #include "qtcpsocket.h"
 
-
 namespace Network {
 class TcpHandler : public QTcpServer, public AbstractHandler {
   Q_OBJECT

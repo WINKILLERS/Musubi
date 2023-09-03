@@ -150,7 +150,8 @@ void Window::MainWindow::Setting::onLanguageFileEdited(QString file) {
 bool Window::MainWindow::Setting::validateCode(QString code,
                                                bool is_automated) {
   try {
-    auto token = code.toStdString();
+    auto tmp = code.toUtf8();
+    std::string token(tmp.data(), tmp.size());
     auto decoded = jwt::decode(token);
     auto verifier =
         jwt::verify()

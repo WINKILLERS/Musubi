@@ -2,7 +2,12 @@
 #include "AApch.h"
 #include "Controller.h"
 #include "Protocols.h"
+#include <debugapi.h>
 
+#define CASE_AND_EMIT(pt, sig)                                                 \
+  case (Packet::Type)pt::PacketType:                                           \
+    emit sig(parser.header, std::dynamic_pointer_cast<pt>(parser.body));       \
+    break;
 
 void Network::IPacketNotify::dispatch(const Packet::Parser &parser) {
   auto type = parser.header->type;
@@ -14,82 +19,21 @@ void Network::IPacketNotify::dispatch(const Packet::Parser &parser) {
 
   // Dispatch request
   switch (type) {
-  case Packet::Type::response_information:
-    emit recvInformation(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseInformation>(parser.body));
-    break;
-  case Packet::Type::response_delete_file:
-    emit recvDeleteFile(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseDeleteFile>(parser.body));
-    break;
-  case Packet::Type::response_download_file:
-    emit recvDownloadFile(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseDownloadFile>(parser.body));
-    break;
-  case Packet::Type::response_execute_file:
-    emit recvExecuteFile(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseExecuteFile>(parser.body));
-    break;
-  case Packet::Type::response_get_process:
-    emit recvGetProcess(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseGetProcess>(parser.body));
-    break;
-  case Packet::Type::response_query_file:
-    emit recvQueryFile(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseQueryFile>(parser.body));
-    break;
-  case Packet::Type::response_query_program:
-    emit recvQueryProgram(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseQueryProgram>(parser.body));
-    break;
-  case Packet::Type::response_reinitialize:
-    emit recvReinitialize(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseReinitialize>(parser.body));
-    break;
-  case Packet::Type::response_remote_screen:
-    emit recvRemoteScreen(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseRemoteScreen>(parser.body));
-    break;
-  case Packet::Type::response_start_process:
-    emit recvStartProcess(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseStartProcess>(parser.body));
-    break;
-  case Packet::Type::response_task_autostart:
-    emit recvTaskAutoStart(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseTaskAutoStart>(parser.body));
-    break;
-  case Packet::Type::response_terminate_process:
-    emit recvTerminateProcess(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseTerminateProcess>(
-            parser.body));
-    break;
-  case Packet::Type::response_upload_file:
-    emit recvUploadFile(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseUploadFile>(parser.body));
-    break;
-  case Packet::Type::response_get_key:
-    emit recvGetKey(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseGetKey>(parser.body));
-    break;
-  case Packet::Type::response_heartbeat:
-    emit recvHeartbeat(
-        parser.header,
-        std::dynamic_pointer_cast<Packet::ResponseHeartbeat>(parser.body));
-    break;
+    CASE_AND_EMIT(Packet::ResponseInformation, recvInformation);
+    CASE_AND_EMIT(Packet::ResponseDeleteFile, recvDeleteFile);
+    CASE_AND_EMIT(Packet::ResponseDownloadFile, recvDownloadFile);
+    CASE_AND_EMIT(Packet::ResponseExecuteFile, recvExecuteFile);
+    CASE_AND_EMIT(Packet::ResponseGetProcess, recvGetProcess);
+    CASE_AND_EMIT(Packet::ResponseQueryFile, recvQueryFile);
+    CASE_AND_EMIT(Packet::ResponseQueryProgram, recvQueryProgram);
+    CASE_AND_EMIT(Packet::ResponseReinitialize, recvReinitialize);
+    CASE_AND_EMIT(Packet::ResponseRemoteScreen, recvRemoteScreen);
+    CASE_AND_EMIT(Packet::ResponseStartProcess, recvStartProcess);
+    CASE_AND_EMIT(Packet::ResponseTaskAutoStart, recvTaskAutoStart);
+    CASE_AND_EMIT(Packet::ResponseTerminateProcess, recvTerminateProcess);
+    CASE_AND_EMIT(Packet::ResponseUploadFile, recvUploadFile);
+    CASE_AND_EMIT(Packet::ResponseGetKey, recvGetKey);
+    CASE_AND_EMIT(Packet::ResponseHeartbeat, recvHeartbeat);
   default:
     spdlog::error("bug detected, unhandled request");
     assert(false);
@@ -242,6 +186,8 @@ bool Network::AbstractHandler::migratePendingSession(AbstractSession *session) {
 
   // If role is controller
   if (session->isController()) {
+    auto debug = session->getRemoteAddress();
+    DebugBreak();
     spdlog::info("client {}({}) connected", session->getRemoteAddress(),
                  fmt::ptr(session));
 

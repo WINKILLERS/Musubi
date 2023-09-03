@@ -1,7 +1,6 @@
 #include "Tcp.h"
 #include "AApch.h"
 
-
 Network::TcpClient::TcpClient(asio::io_context &io_context,
                               const asio::ip::tcp::endpoint &endpoint,
                               const std::string &handshake_id)

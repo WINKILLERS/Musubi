@@ -2,7 +2,6 @@
 #include "Protocols.h"
 #include "Tcp.h"
 
-
 namespace Network {
 class Program : public TcpClient {
 public:

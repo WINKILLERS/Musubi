@@ -1,4 +1,4 @@
-add_requires("spdlog","zlib","utfcpp","vcpkg::libsigcpp","vcpkg::infoware","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+add_requires("spdlog","xxhash","zlib","utfcpp","vcpkg::libsigcpp","vcpkg::infoware","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
 
 target("MusubiNativeClient")
     set_kind("binary")
@@ -11,6 +11,6 @@ target("MusubiNativeClient")
 
     add_includedirs("$(projectdir)/src/MusubiNativeClient")
 
-    add_packages("spdlog","zlib","utfcpp","vcpkg::libsigcpp","vcpkg::infoware","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+    add_packages("spdlog","xxhash","zlib","utfcpp","vcpkg::libsigcpp","vcpkg::infoware","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
     add_deps("MusubiBridge")
     add_syslinks("gdi32","Secur32.lib","wbemuuid.lib","OleAut32.lib","Shell32.lib","ntdll.lib","user32")

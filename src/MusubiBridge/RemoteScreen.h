@@ -148,25 +148,32 @@ public:
 
 class ResponseRemoteScreen : public AbstractPacket {
 public:
-  uint32_t x;
-  uint32_t y;
-  uint32_t width;
-  uint32_t height;
-  std::string screen;
+  struct ScreenRect {
+    uint32_t x;
+    uint32_t y;
+    uint32_t width;
+    uint32_t height;
+    std::string screen;
+  };
+
+  ScreenRect rect;
 
   ResponseRemoteScreen() = default;
   ResponseRemoteScreen(const uint32_t &x, const uint32_t &y,
                        const uint32_t &width, const uint32_t &height,
                        const std::string &screen,
-                       const uint8_t &compression_level = 3)
-      : x(x), y(y), width(width), height(height), screen(screen),
-        compression_level(compression_level) {}
+                       const uint8_t &compress_level = 3)
+      : rect(x, y, width, height, screen), compress_level(compress_level) {}
   ResponseRemoteScreen(const uint32_t &x, const uint32_t &y,
                        const uint32_t &width, const uint32_t &height,
-                       std::string &&screen,
-                       const uint8_t &compression_level = 3)
-      : x(x), y(y), width(width), height(height), screen(std::move(screen)),
-        compression_level(compression_level) {}
+                       std::string &&screen, const uint8_t &compress_level = 3)
+      : rect(x, y, width, height, std::move(screen)),
+        compress_level(compress_level) {}
+  ResponseRemoteScreen(const ScreenRect &rect,
+                       const uint8_t &compress_level = 3)
+      : rect(rect), compress_level(compress_level) {}
+  ResponseRemoteScreen(ScreenRect &&rect, const uint8_t &compress_level = 3)
+      : rect(std::move(rect)), compress_level(compress_level) {}
 
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
@@ -175,11 +182,12 @@ public:
   inline Type getType() const override final { return (Type)PacketType; }
 
   inline bool operator==(const ResponseRemoteScreen &other) const {
-    return width == other.width && height == other.height &&
-           screen == other.screen;
+    return rect.width == other.rect.width && rect.height == other.rect.height &&
+           rect.screen == other.rect.screen && rect.x == other.rect.x &&
+           rect.y == other.rect.y;
   }
 
 private:
-  uint8_t compression_level;
+  uint8_t compress_level;
 };
 } // namespace Packet

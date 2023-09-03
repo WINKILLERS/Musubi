@@ -2,7 +2,6 @@
 #include "AApch.h"
 #include "Util/Util.h"
 
-
 void Network::Heartbeat::run() noexcept {
   performHandshake(Packet::Handshake::Role::heartbeat);
 

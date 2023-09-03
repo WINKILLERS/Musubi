@@ -6,7 +6,6 @@
 #include "fstream"
 #include "shellapi.h"
 
-
 Network::File::~File() {}
 
 void Network::File::run() noexcept {
