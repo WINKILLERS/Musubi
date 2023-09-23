@@ -1,4 +1,8 @@
-add_requires("spdlog","qt6core","qt6network","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+if is_mode("release") then
+    set_runtimes("MD")
+else
+    set_runtimes("MDd")
+end 
 
 target("MusubiServer")
     add_rules("qt.widgetapp")
@@ -14,6 +18,17 @@ target("MusubiServer")
 
     add_includedirs("$(projectdir)/src/MusubiServer")
 
-    add_packages("spdlog","qt6core","qt6network","zlib","libcurl","openssl","nlohmann_json","magic_enum","fmt","cpr")
+    add_packages("spdlog~Dynamic")
+    add_packages("utfcpp~Dynamic")
+    add_packages("zlib~Dynamic")
+    add_packages("libcurl~Dynamic")
+    add_packages("openssl~Dynamic")
+    add_packages("vcpkg::jwt-cpp~Dynamic")
+    add_packages("nlohmann_json~Dynamic")
+    add_packages("magic_enum~Dynamic")
+    add_packages("fmt~Dynamic")
+    add_packages("cpr~Dynamic")
+    
     add_frameworks("QtNetwork","QtGui","QtCore")
-    add_deps("MusubiBridge","MusubiActivator")
+
+    add_deps("MusubiBridgeDynamic","MusubiActivator")

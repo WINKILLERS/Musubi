@@ -2,7 +2,39 @@ add_rules("mode.debug", "mode.release")
 
 set_project("Musubi")
 
-includes("src/**/*.lua")
+function add_full_require(name)
+    if is_mode("release") then
+        add_requires(name .. "~Static", {configs = {vs_runtime = "MT", debug = false}})
+        add_requires(name .. "~Dynamic", {configs = {vs_runtime = "MD", debug = false}})
+    else
+        add_requires(name .. "~Static", {configs = {vs_runtime = "MTd", debug = true}})
+        add_requires(name .. "~Dynamic", {configs = {vs_runtime = "MDd", debug = true}})
+    end 
+end
+
+add_full_require("nlohmann_json")
+add_full_require("crossguid")
+add_full_require("zstd")
+add_full_require("vcpkg::libsigcpp")
+add_full_require("vcpkg::infoware")
+add_full_require("spdlog")
+add_full_require("winreg")
+add_full_require("asio")
+add_full_require("xxhash")
+add_full_require("zlib")
+add_full_require("utfcpp")
+add_full_require("libcurl")
+add_full_require("openssl")
+add_full_require("nlohmann_json")
+add_full_require("magic_enum")
+add_full_require("fmt")
+add_full_require("cpr")
+add_full_require("vcpkg::jwt-cpp")
+add_full_require("http_parser")
+add_full_require("restinio")
+add_full_require("argparse")
+
+includes("src/**/xmake.lua")
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io

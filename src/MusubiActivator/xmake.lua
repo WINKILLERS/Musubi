@@ -1,4 +1,8 @@
-add_requires("spdlog","http_parser","restinio","nlohmann_json","magic_enum","fmt","cpr","asio","argparse","openssl")
+if is_mode("release") then
+    set_runtimes("MD")
+else
+    set_runtimes("MDd")
+end 
 
 target("MusubiActivator")
     set_kind("binary")
@@ -11,4 +15,14 @@ target("MusubiActivator")
 
     add_includedirs("$(projectdir)/src/MusubiActivator")
 
-    add_packages("spdlog","http_parser","restinio","nlohmann_json","magic_enum","fmt","cpr","asio","argparse","openssl")
+    add_packages("spdlog~Dynamic")
+    add_packages("openssl~Dynamic")
+    add_packages("vcpkg::jwt-cpp~Dynamic")
+    add_packages("http_parser~Dynamic")
+    add_packages("restinio~Dynamic")
+    add_packages("nlohmann_json~Dynamic")
+    add_packages("magic_enum~Dynamic")
+    add_packages("fmt~Dynamic")
+    add_packages("cpr~Dynamic")
+    add_packages("asio~Dynamic")
+    add_packages("argparse~Dynamic")

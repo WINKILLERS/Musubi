@@ -7,7 +7,6 @@
 #include "qheaderview.h"
 #include "qmessagebox.h"
 
-
 Window::MainWindow::MusubiServer::MusubiServer(Setting *setting,
                                                QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MusubiServerClass()), setting(setting) {
