@@ -5,6 +5,8 @@ handshaked
 hwid
 Mitsuha
 Musubi
+Pixmap
+qobject
 spdlog
 SRCCOPY
 Subchannel

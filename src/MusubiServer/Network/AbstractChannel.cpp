@@ -7,7 +7,6 @@
 #include "ProgramChannel.h"
 #include "ScreenChannel.h"
 
-
 Network::AbstractChannel::AbstractChannel(AbstractSession *session,
                                           AbstractChannel *parent)
     : session(session), parent(parent), QObject(nullptr) {

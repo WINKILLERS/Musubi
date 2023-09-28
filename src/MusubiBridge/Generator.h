@@ -15,6 +15,7 @@ public:
   // We do not allow copy
   AbstractGenerator(const AbstractGenerator &) = delete;
   AbstractGenerator &operator=(const AbstractGenerator &) = delete;
+  virtual ~AbstractGenerator() = default;
 
   virtual std::string buildJson() const = 0;
 

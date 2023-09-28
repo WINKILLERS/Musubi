@@ -2,7 +2,6 @@
 #include "AApch.h"
 #include "Protocols.h"
 
-
 Network::TcpHandler::TcpHandler(uint16_t port, QObject *parent)
     : AbstractHandler(), QTcpServer(parent), port(port) {
   spdlog::debug("initializing tcp handler with port: {}", port);
@@ -173,7 +172,7 @@ void Network::TcpSession::appendToBufferInternal(uint32_t depth) {
     }
   }
 
-  // If we have available bytes that can calcuate required size
+  // If we have available bytes that can calculate required size
   if (bytesAvailable() >= 3 * sizeof(uint64_t)) {
     appendToBufferInternal(depth + 1);
   }
