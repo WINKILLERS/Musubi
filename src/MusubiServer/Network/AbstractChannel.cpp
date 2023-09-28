@@ -112,8 +112,8 @@ bool Network::AbstractMultiChannel::addSubChannel(
 
   if (role == Packet::Handshake::Role::file) {
     channel = new FileChannel(sub_session, this);
-  } else if (role == Packet::Handshake::Role::keyboard_monitor) {
-  } else if (role == Packet::Handshake::Role::remote_hidden_screen) {
+    //} else if (role == Packet::Handshake::Role::keyboard_monitor) {
+    //} else if (role == Packet::Handshake::Role::remote_hidden_screen) {
   } else if (role == Packet::Handshake::Role::remote_screen) {
     channel = new ScreenChannel(sub_session, this);
   } else if (role == Packet::Handshake::Role::heartbeat) {
