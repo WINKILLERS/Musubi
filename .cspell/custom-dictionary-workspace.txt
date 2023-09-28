@@ -1,0 +1,11 @@
+# Custom Dictionary Words
+CXSCREEN
+CYSCREEN
+handshaked
+hwid
+Mitsuha
+Musubi
+spdlog
+SRCCOPY
+Subchannel
+unhandshaked

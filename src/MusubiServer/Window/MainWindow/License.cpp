@@ -6,25 +6,14 @@ Window::MainWindow::License::License(QWidget *parent)
   ui->setupUi(this);
 }
 
-Window::MainWindow::License::License(const QString &user, bool show,
-                                     QWidget *parent)
-    : user(user), is_show(show), QDialog(parent), ui(new Ui::License()) {
+Window::MainWindow::License::License(const QString &user, QWidget *parent)
+    : user(user), QDialog(parent), ui(new Ui::License()) {
   ui->setupUi(this);
 
-  showRegistered(is_show);
   setRegisteredUser(user);
 }
 
 Window::MainWindow::License::~License() { delete ui; }
-
-void Window::MainWindow::License::showRegistered(bool show_) {
-  is_show = show_;
-
-  if (is_show)
-    ui->register_message->show();
-  else
-    ui->register_message->hide();
-}
 
 void Window::MainWindow::License::setRegisteredUser(QString user_) {
   user = user_;

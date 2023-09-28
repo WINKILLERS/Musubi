@@ -2,6 +2,8 @@
 #include "Window/MainWindow/MusubiServer.h"
 #include "Window/MainWindow/Setting.h"
 #include "qapplication.h"
+#include "qmessagebox.h"
+#include "qobject.h"
 #include "qtextedit.h"
 #include "qtranslator.h"
 #include "random"
@@ -42,38 +44,51 @@ int main(int argc, char *argv[]) {
 
   // Set log level
   spdlog::set_level((spdlog::level::level_enum)setting->getLogLevel());
-  spdlog::set_level(spdlog::level::level_enum::debug);
 
   // Install translation
   auto language_file = setting->getLanguageFile();
   if (language_file.isEmpty() == false) {
     if (translator.load(language_file) == true) {
       spdlog::info("installing translation file");
+
       a.installTranslator(&translator);
       setting->retranslate();
-    } else
+    } else {
       spdlog::error("unable to open translation file");
+    }
   }
 
-  // Initialize main window
-  auto *w = new Window::MainWindow::MusubiServer(setting);
+  if (setting->getActivationLevel() == ActivationLevel::NotActivated) {
+    spdlog::error("not registered");
 
-  // Set setting parent
-  setting->setParent(w);
-  setting->setWindowFlag(Qt::Window);
+    QMessageBox::critical(
+        setting, QObject::tr("Registration Required"),
+        QObject::tr("You are not registered, or token expired, please "
+                    "input new one or contact your administrator"));
 
-  // Show logger
-  text_edit->setWindowFlag(Qt::Window);
-  text_edit->setWindowFlag(Qt::WindowCloseButtonHint, false);
-  text_edit->show();
+    setting->show();
+  } else {
+    // Initialize main window
+    auto *w = new Window::MainWindow::MusubiServer(setting);
 
-  // Once main window closed, exit all
-  w->setAttribute(Qt::WA_DeleteOnClose);
-  QObject::connect(w, &QMainWindow::destroyed, &a, &QApplication::quit);
+    // Set setting parent
+    setting->setParent(w);
+    setting->setWindowFlag(Qt::Window);
 
-  // Auto scroll
-  QObject::connect(text_edit, &QTextEdit::textChanged,
-                   [text_edit]() { text_edit->moveCursor(QTextCursor::End); });
+    // Show logger
+    text_edit->setWindowFlag(Qt::Window);
+    text_edit->setWindowFlag(Qt::WindowCloseButtonHint, false);
+    text_edit->show();
+
+    // Once main window closed, exit all
+    w->setAttribute(Qt::WA_DeleteOnClose);
+    QObject::connect(w, &QMainWindow::destroyed, &a, &QApplication::quit);
+
+    // Auto scroll log
+    QObject::connect(text_edit, &QTextEdit::textChanged, [text_edit]() {
+      text_edit->moveCursor(QTextCursor::End);
+    });
+  }
 
   return a.exec();
 }

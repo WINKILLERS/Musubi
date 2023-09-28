@@ -9,17 +9,15 @@ class License : public QDialog {
 
 public:
   explicit License(QWidget *parent = nullptr);
-  License(const QString &user, bool show, QWidget *parent = nullptr);
+  License(const QString &user, QWidget *parent = nullptr);
   ~License();
 
-  void showRegistered(bool show_);
   void setRegisteredUser(QString user_);
 
 private:
   Ui::License *ui = nullptr;
 
   QString user;
-  bool is_show = false;
 };
 } // namespace MainWindow
 } // namespace Window

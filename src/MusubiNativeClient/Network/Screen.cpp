@@ -148,13 +148,14 @@ ScreenCapturer::getDiff() {
         auto hash = getRectHash(x, y);
 
         // The chunk changed
+        const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
         if (prev_buffers[x][y].hash != hash) {
           Packet::ResponseRemoteScreen::ScreenRect rect;
           rect.x = x * chunk_width;
           rect.y = y * chunk_height;
           rect.width = prev_buffers[x][y].chunk_width;
           rect.height = prev_buffers[x][y].chunk_height;
-          rect.screen.resize(rect.width * rect.height);
+          rect.screen.resize(rect.width * rect.height * bitsPerPixel);
           copyRectTo(x, y, rect.screen.data());
           rects.push_back(rect);
 
@@ -222,8 +223,9 @@ bool ScreenCapturer::ConstructBI(uint16_t biBitCount, uint32_t biWidth,
 }
 
 XXH64_hash_t ScreenCapturer::getRectHash(uint32_t x, uint32_t y) {
-  auto buffer_size =
-      prev_buffers[x][y].chunk_width * prev_buffers[x][y].chunk_height;
+  const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
+  auto buffer_size = prev_buffers[x][y].chunk_width *
+                     prev_buffers[x][y].chunk_height * bitsPerPixel;
   char *buffer = new char[buffer_size];
 
   // Copy rect
@@ -239,16 +241,18 @@ XXH64_hash_t ScreenCapturer::getRectHash(uint32_t x, uint32_t y) {
 
 void ScreenCapturer::copyRectTo(uint32_t x, uint32_t y, void *dest) {
   // Start copying from original buffer
+  const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
   auto line_scanned = 0;
   auto current_original_pos =
-      (char *)full_buffer + y * chunk_height * screen_width + x * chunk_width;
+      (char *)full_buffer +
+      (y * chunk_height * screen_width + x * chunk_width) * bitsPerPixel;
   auto current_chunk_pos = (char *)dest;
   do {
     memcpy(current_chunk_pos, current_original_pos,
-           prev_buffers[x][y].chunk_width);
+           prev_buffers[x][y].chunk_width * bitsPerPixel);
 
-    current_chunk_pos += prev_buffers[x][y].chunk_width;
-    current_original_pos += screen_width;
+    current_chunk_pos += prev_buffers[x][y].chunk_width * bitsPerPixel;
+    current_original_pos += screen_width * bitsPerPixel;
     line_scanned++;
   } while (line_scanned < prev_buffers[x][y].chunk_height);
 }

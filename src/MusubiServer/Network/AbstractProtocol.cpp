@@ -187,7 +187,6 @@ bool Network::AbstractHandler::migratePendingSession(AbstractSession *session) {
   // If role is controller
   if (session->isController()) {
     auto debug = session->getRemoteAddress();
-    DebugBreak();
     spdlog::info("client {}({}) connected", session->getRemoteAddress(),
                  fmt::ptr(session));
 
@@ -249,7 +248,7 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
       (double)buffer.size() / 1024);
 
   if (type == Packet::Type::handshake) {
-    // If session is initialized, reject all reinitialization
+    // If session is initialized, reject all re-initialization
     if (isHandshaked()) {
       spdlog::error("session initialized but still sending handshake");
       shutdown();

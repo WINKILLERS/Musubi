@@ -17,9 +17,6 @@ public:
   explicit Setting(QWidget *parent = nullptr);
   ~Setting();
 
-  // Get listen address
-  inline QString getListenAddress() const { return listen_address; };
-
   // Get listen port
   inline uint16_t getPort() const { return port; };
 
@@ -32,7 +29,7 @@ public:
   inline spdlog::level::level_enum getLogLevel() const { return log_level; };
 
   // Get user name
-  inline QString getRegisteredUser() const { return registered_user; };
+  inline QString getUser() const { return user; };
 
   // Get language file path
   inline QString getLanguageFile() const { return language_file; };
@@ -54,26 +51,29 @@ private:
 
   QSettings *settings = nullptr;
 
-  QString listen_address;
   uint16_t port = 0;
   QString activation_code;
   ActivationLevel activation_level = ActivationLevel::NotActivated;
   spdlog::level::level_enum log_level = spdlog::level::info;
-  QString registered_user = "Unknown";
+  QString user = "Unknown";
   QString language_file;
   bool set_language = false;
+
+  const std::string pub_key = R"(-----BEGIN PUBLIC KEY-----
+MEMwBQYDK2VxAzoA3FWPh5/qGXoaNfQzeUCXpJEybbXneKo+R+Ahery1KPukFs80
+pjGN7W6uRRAAZb3qAxt8NByCrlCA
+-----END PUBLIC KEY-----)";
 
 private slots:
   void onSaveClicked(bool);
 
-  void onListenAddressEdited(QString listen_address_);
   void onPortEdited(QString port_);
   void onCodeEdited(QString code);
   void onLogLevelChanged(int level);
   void onLanguageFileEdited(QString file);
   void onBrowseLanguageFile(bool);
 
-  bool validateCode(QString code, bool is_automated = false);
+  bool validateCode(QString code);
 };
 } // namespace MainWindow
 } // namespace Window

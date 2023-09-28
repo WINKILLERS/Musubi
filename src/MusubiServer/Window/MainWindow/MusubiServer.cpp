@@ -15,17 +15,6 @@ Window::MainWindow::MusubiServer::MusubiServer(Setting *setting,
 
   ui->setupUi(this);
 
-  if (setting->getActivationLevel() == ActivationLevel::NotActivated) {
-    spdlog::error("not registered");
-
-    QMessageBox::critical(this, tr("Registration Required"),
-                          tr("You are not registered, or token expired, please "
-                             "input new one or contact your administrator"));
-
-    setting->show();
-    return;
-  }
-
   spdlog::info("setting up handler");
   handler = new Network::TcpHandler(setting->getPort(), this);
   if (handler->listen() == false) {
@@ -102,9 +91,7 @@ void Window::MainWindow::MusubiServer::actShowSetting() { setting->show(); }
 
 void Window::MainWindow::MusubiServer::actShowLicense() {
   if (license == nullptr) {
-    license = new License(
-        setting->getRegisteredUser(),
-        setting->getActivationLevel() != ActivationLevel::NotActivated, this);
+    license = new License(setting->getUser(), this);
   }
 
   license->show();
