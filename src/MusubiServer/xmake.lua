@@ -28,6 +28,11 @@ target("MusubiServer")
     add_packages("magic_enum~Dynamic")
     add_packages("fmt~Dynamic")
     add_packages("cpr~Dynamic")
+
+    add_packages("qt6core~Dynamic")
+    add_packages("qt6gui~Dynamic")
+    add_packages("qt6network~Dynamic")
+    add_packages("qt6widgets~Dynamic")
     
     add_frameworks("QtNetwork","QtGui","QtCore")
 
