@@ -2,6 +2,7 @@
 #include "AApch.h"
 #include "Network/ScreenChannel.h"
 #include "qevent.h"
+#include "qobject.h"
 #include "qpainter.h"
 
 Window::Control::ScreenDisplayer::ScreenDisplayer(QWidget *parent)
