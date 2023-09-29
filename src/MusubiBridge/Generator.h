@@ -19,9 +19,15 @@ public:
 
   virtual std::string buildJson() const = 0;
 
-  inline void setId(const std::string &id = "") { header.id = id; }
+  inline AbstractGenerator &setId(const std::string &id = "") {
+    header.id = id;
+    return *this;
+  }
+  inline std::string getId(const std::string &id = constructId()) const {
+    return header.id;
+  }
 
-  static std::string getId();
+  static std::string constructId();
 };
 
 template <typename PacketType> class Generator : public AbstractGenerator {
@@ -40,12 +46,12 @@ public:
 
 template <typename PacketType>
 inline Generator<PacketType>::Generator()
-    : AbstractGenerator(body.getType(), ""), body() {}
+    : AbstractGenerator(body.getType(), constructId()), body() {}
 
 template <typename PacketType>
 template <class... _Valty>
 inline Generator<PacketType>::Generator(_Valty &&..._Val)
-    : AbstractGenerator(body.getType(), ""),
+    : AbstractGenerator(body.getType(), constructId()),
       body(std::forward<_Valty>(_Val)...) {}
 
 template <typename PacketType>

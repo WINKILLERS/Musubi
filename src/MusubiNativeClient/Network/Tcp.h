@@ -15,11 +15,13 @@ public:
 
 protected:
   // AbstractClient implementation
-  virtual bool
-  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept override;
   virtual std::optional<Packet::Parser> readJsonPacket() noexcept override;
 
 private:
+  // AbstractClient implementation
+  virtual bool sendJsonPacketInternal(
+      const Packet::AbstractGenerator &packet) noexcept override;
+
   // Tcp socket
   asio::ip::tcp::socket socket;
 

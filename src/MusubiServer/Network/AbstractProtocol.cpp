@@ -3,6 +3,8 @@
 #include "Controller.h"
 #include "Protocols.h"
 #include <debugapi.h>
+#include <optional>
+#include <utility>
 
 #define CASE_AND_EMIT(pt, sig)                                                 \
   case (Packet::Type)pt::PacketType:                                           \
@@ -63,7 +65,7 @@ Network::AbstractHandler::~AbstractHandler() {
     session->shutdown();
 
     // Because the handler already shutdown, it can not delete session after
-    // dtor anymore So we have to delete it manually
+    // dtor anymore. So we have to delete it manually
     session->deleteSelf();
   }
 
@@ -135,9 +137,6 @@ bool Network::AbstractHandler::removeSession(AbstractSession *session) {
         // Delete from controller
         controller->removeSubChannel(session);
       }
-
-      // Delete from memory
-      session->deleteSelf();
     }
   }
 
@@ -229,6 +228,21 @@ Network::AbstractSession::~AbstractSession() {
 
   hwid.clear();
   handshake_id.clear();
+  pending_packets.clear();
+}
+
+std::optional<QFuture<std::pair<std::shared_ptr<Packet::Header>,
+                                std::shared_ptr<Packet::AbstractPacket>>>>
+Network::AbstractSession::sendJsonPacket(
+    const Packet::AbstractGenerator &packet) noexcept {
+  auto id = packet.getId();
+
+  if (sendJsonPacketInternal(packet) == true) {
+    auto &task = pending_packets[id];
+    return task.future();
+  } else {
+    return std::nullopt;
+  }
 }
 
 bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
@@ -261,7 +275,8 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
     // Set hwid
     hwid = packet->message;
 
-    handshake_id = parser.header->id;
+    // Set handshake id
+    handshake_id = id;
 
     // If role is controller, initialize the session
     if (isController()) {
@@ -286,6 +301,14 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
     spdlog::error("sending request before initialization");
     shutdown();
     return false;
+  }
+
+  try {
+    auto packet = std::move(pending_packets.at(id));
+    pending_packets.erase(id);
+    packet.addResult(std::make_pair(parser.header, parser.body));
+    packet.finish();
+  } catch (const std::exception &) {
   }
 
   try {

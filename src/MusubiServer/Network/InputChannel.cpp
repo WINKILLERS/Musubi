@@ -2,7 +2,6 @@
 #include "AApch.h"
 #include "AbstractProtocol.h"
 
-
 Network::InputChannel::InputChannel(AbstractSession *session,
                                     AbstractChannel *parent)
     : AbstractChannel(session, parent) {}
@@ -15,8 +14,9 @@ bool Network::InputChannel::sendMouse(
     return true;
   }
 
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestSetMouse>(mouse_inputs));
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestSetMouse>(mouse_inputs))
+      .has_value();
 }
 
 bool Network::InputChannel::sendKeyboard(
@@ -26,6 +26,8 @@ bool Network::InputChannel::sendKeyboard(
     return true;
   }
 
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestSetKeyboard>(keyboard_inputs));
+  return session
+      ->sendJsonPacket(
+          Packet::Generator<Packet::RequestSetKeyboard>(keyboard_inputs))
+      .has_value();
 }

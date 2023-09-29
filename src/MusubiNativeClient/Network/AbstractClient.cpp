@@ -14,6 +14,11 @@ Network::AbstractClient::~AbstractClient() {
   spdlog::info("session {} dtor", fmt::ptr(this));
 }
 
+bool Network::AbstractClient::sendJsonPacket(
+    const Packet::AbstractGenerator &packet) noexcept {
+  return sendJsonPacketInternal(packet);
+}
+
 bool Network::AbstractClient::performHandshake(
     Packet::Handshake::Role role) noexcept {
   spdlog::debug("performing handshake with role: {}, id: {}",

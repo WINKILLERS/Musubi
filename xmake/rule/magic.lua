@@ -1,10 +1,9 @@
 rule("aux.magic")
-    on_build(function (target)
+    before_build(function (target)
         import("core.project.depend")
 
         local sources = {}
         local magic = 0
-        math.randomseed(os.time())
 
         for _, sourcebatch in pairs(target:sourcebatches()) do
             for _, sourcefile in ipairs(sourcebatch.sourcefiles) do
@@ -13,6 +12,7 @@ rule("aux.magic")
         end
 
         if _g.sources ~= sources then
+            math.randomseed(os.time())
             _g.magic = math.random(0xFFFFFFFF)
         end
 

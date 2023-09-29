@@ -6,8 +6,10 @@ hwid
 Mitsuha
 Musubi
 Pixmap
+qintptr
 qobject
 spdlog
+spinbox
 SRCCOPY
 Subchannel
 unhandshaked

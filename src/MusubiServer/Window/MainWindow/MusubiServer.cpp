@@ -123,7 +123,7 @@ bool Window::MainWindow::MusubiServer::openSubchannel(
 
   auto request = std::move(request_ret.value());
   request.then([this](Network::AbstractChannel *sub_channel) {
-    sub_channel->showWindow();
+    sub_channel->showWindow(this);
   });
 
   return true;

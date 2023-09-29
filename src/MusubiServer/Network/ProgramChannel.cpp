@@ -21,8 +21,9 @@ Network::ProgramChannel::ProgramChannel(AbstractSession *session,
 Network::ProgramChannel::~ProgramChannel() {}
 
 bool Network::ProgramChannel::refresh() {
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestQueryProgram>());
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryProgram>())
+      .has_value();
 }
 
 bool Network::ProgramChannel::openInViewFile(const std::wstring &path) {

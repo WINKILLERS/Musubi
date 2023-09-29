@@ -6,7 +6,6 @@
 #include "ProgramChannel.h"
 #include "ScreenChannel.h"
 
-
 Network::Controller::Controller(AbstractSession *session)
     : AbstractMultiChannel(session, nullptr) {
   // Forward signals
@@ -45,13 +44,15 @@ std::string Network::Controller::getRemoteAddress() const {
 std::string Network::Controller::getHwid() const { return session->getHwid(); }
 
 bool Network::Controller::requestInformation() {
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestInformation>());
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestInformation>())
+      .has_value();
 }
 
 bool Network::Controller::requestProgram() {
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestQueryProgram>());
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryProgram>())
+      .has_value();
 }
 
 void Network::Controller::onInformation(
@@ -80,8 +81,8 @@ void Network::Controller::onChannelConnected(Packet::Handshake::Role role,
             &Controller::recvQueryFile);
     connect(pointer, &FileChannel::recvUploadFile, this,
             &Controller::recvUploadFile);
-  } else if (role == Packet::Handshake::Role::keyboard_monitor) {
-  } else if (role == Packet::Handshake::Role::remote_hidden_screen) {
+    //} else if (role == Packet::Handshake::Role::keyboard_monitor) {
+    //} else if (role == Packet::Handshake::Role::remote_hidden_screen) {
   } else if (role == Packet::Handshake::Role::remote_screen) {
     auto pointer = (ScreenChannel *)sub_channel;
     connect(pointer, &ScreenChannel::recvRemoteScreen, this,

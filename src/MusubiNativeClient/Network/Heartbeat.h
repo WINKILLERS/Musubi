@@ -2,6 +2,8 @@
 #include "Protocols.h"
 #include "Tcp.h"
 
+using namespace std::chrono_literals;
+
 namespace Network {
 class Heartbeat : public TcpClient {
 public:

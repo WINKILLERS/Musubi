@@ -11,7 +11,7 @@ target("MusubiBridgeDynamic")
 
     add_files("*.cpp")
     add_headerfiles("*.h")
-    add_includedirs("$(projectdir)/src/MusubiBridge",{public=true})
+    add_includedirs("$(projectdir)/src/MusubiBridge", {public = true})
 
     add_packages("nlohmann_json~Dynamic")
     add_packages("crossguid~Dynamic")
@@ -30,7 +30,7 @@ target("MusubiBridgeStatic")
 
     add_files("*.cpp")
     add_headerfiles("*.h")
-    add_includedirs("$(projectdir)/src/MusubiBridge",{public=true})
+    add_includedirs("$(projectdir)/src/MusubiBridge", {public = true})
 
     add_packages("nlohmann_json~Static")
     add_packages("crossguid~Static")

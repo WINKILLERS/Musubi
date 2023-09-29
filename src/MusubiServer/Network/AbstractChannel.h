@@ -22,7 +22,7 @@ signals:
   void lag(uint32_t lag);
 
 protected:
-  // Only reference
+  // Own the session
   AbstractSession *session = nullptr;
 
   // Own the window (if present)
@@ -57,7 +57,8 @@ protected:
   void removeSubChannel(AbstractSession *session);
 
   // Pending channel creation tasks
-  std::unordered_map<std::string, QPromise<AbstractChannel *>> pending_tasks;
+  std::unordered_map<std::string /*id*/, QPromise<AbstractChannel *>>
+      pending_tasks;
 
   // Sub channels, own AbstractChannel*
   std::unordered_map<Packet::Handshake::Role, AbstractChannel *> sub_channels;

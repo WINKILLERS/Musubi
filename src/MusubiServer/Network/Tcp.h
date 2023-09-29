@@ -23,7 +23,7 @@ public:
   virtual void deleteSelf() noexcept override { deleteLater(); };
 
 protected:
-  // Reimplementation for QTcpServer
+  // Re-implementation for QTcpServer
   void incomingConnection(qintptr socket_descriptor) override;
 
 private slots:
@@ -51,8 +51,8 @@ public:
   virtual uint16_t getRemotePort() const noexcept override {
     return peerPort();
   }
-  virtual bool
-  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept override;
+  virtual bool sendJsonPacketInternal(
+      const Packet::AbstractGenerator &packet) noexcept override;
   virtual void shutdown() noexcept override;
   virtual void deleteSelf() noexcept override { deleteLater(); };
 

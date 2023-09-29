@@ -75,7 +75,7 @@ void Network::TcpSession::appendToBuffer() {
   }
 }
 
-bool Network::TcpSession::sendJsonPacket(
+bool Network::TcpSession::sendJsonPacketInternal(
     const Packet::AbstractGenerator &packet) noexcept {
   try {
     spdlog::debug("sending packet with type: {} for {}",

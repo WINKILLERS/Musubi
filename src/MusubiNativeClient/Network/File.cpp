@@ -67,9 +67,9 @@ bool Network::File::onQuery(
     }
   }
 
-  auto generator = Packet::Generator<Packet::ResponseQueryFile>(list, is_error);
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseQueryFile>(list, is_error)
+          .setId(header->id));
 }
 
 bool Network::File::onRemove(
@@ -84,9 +84,9 @@ bool Network::File::onRemove(
   } catch (const std::filesystem::filesystem_error &) {
   }
 
-  auto generator = Packet::Generator<Packet::ResponseDeleteFile>(removed_count);
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseDeleteFile>(removed_count)
+          .setId(header->id));
 }
 
 bool Network::File::onUpload(
@@ -101,9 +101,9 @@ bool Network::File::onUpload(
     file.close();
   }
 
-  auto generator = Packet::Generator<Packet::ResponseUploadFile>(file.fail());
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseUploadFile>(file.fail())
+          .setId(header->id));
 }
 
 bool Network::File::onExecute(
@@ -114,10 +114,9 @@ bool Network::File::onExecute(
   ShellExecuteW(nullptr, L"open", utf8to16(packet->path).c_str(), nullptr,
                 nullptr, SW_SHOW);
 
-  auto generator =
-      Packet::Generator<Packet::ResponseExecuteFile>(GetLastError());
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseExecuteFile>(GetLastError())
+          .setId(header->id));
 }
 
 bool Network::File::onDownload(
@@ -141,8 +140,7 @@ bool Network::File::onDownload(
     file.close();
   }
 
-  auto generator =
-      Packet::Generator<Packet::ResponseDownloadFile>(file.fail(), content);
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseDownloadFile>(file.fail(), content)
+          .setId(header->id));
 }

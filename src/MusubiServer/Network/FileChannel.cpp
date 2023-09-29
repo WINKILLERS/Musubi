@@ -39,8 +39,10 @@ Network::FileChannel::~FileChannel() {
 }
 
 bool Network::FileChannel::refresh() {
-  return session->sendJsonPacket(Packet::Generator<Packet::RequestQueryFile>(
-      current_directory.u8string()));
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryFile>(
+          current_directory.u8string()))
+      .has_value();
 }
 
 bool Network::FileChannel::open(const std::string &directory_name) {
@@ -149,12 +151,12 @@ Network::FileChannel::download(const std::string &file_name) {
 
 QFuture<std::shared_ptr<Packet::ResponseDownloadFile>>
 Network::FileChannel::downloadAbsolute(const std::filesystem::path &path) {
-  auto id = Packet::AbstractGenerator::getId();
-  auto &task = download_tasks[id];
 
   auto generator =
       Packet::Generator<Packet::RequestDownloadFile>(utf8to8(path.u8string()));
-  generator.setId(id);
+
+  auto id = generator.getId();
+  auto &task = download_tasks[id];
 
   session->sendJsonPacket(generator);
 
@@ -197,14 +199,13 @@ Network::FileChannel::uploadAbsolute(const std::wstring &local_path,
   // Read file
   file.read(buffer.data(), file_size);
 
-  // Set up task
-  auto id = Packet::AbstractGenerator::getId();
-  auto &task = upload_tasks[id];
-
   // Construct packet
   auto generator = Packet::Generator<Packet::RequestUploadFile>(
       utf8to8(path.u8string()), std::move(buffer));
-  generator.setId(id);
+
+  // Set up task
+  auto id = generator.getId();
+  auto &task = upload_tasks[id];
 
   session->sendJsonPacket(generator);
 
@@ -242,12 +243,12 @@ Network::FileChannel::execute(const std::string &file_name) {
 
 QFuture<std::shared_ptr<Packet::ResponseExecuteFile>>
 Network::FileChannel::executeAbsolute(const std::filesystem::path &path) {
-  auto id = Packet::AbstractGenerator::getId();
-  auto &task = execute_tasks[id];
 
   auto generator =
       Packet::Generator<Packet::RequestExecuteFile>(utf8to8(path.u8string()));
-  generator.setId(id);
+
+  auto id = generator.getId();
+  auto &task = execute_tasks[id];
 
   session->sendJsonPacket(generator);
 
@@ -285,12 +286,12 @@ Network::FileChannel::remove(const std::string &file_name) {
 
 QFuture<std::shared_ptr<Packet::ResponseDeleteFile>>
 Network::FileChannel::removeAbsolute(const std::filesystem::path &path) {
-  auto id = Packet::AbstractGenerator::getId();
-  auto &task = remove_tasks[id];
 
   auto generator =
       Packet::Generator<Packet::RequestDeleteFile>(utf8to8(path.u8string()));
-  generator.setId(id);
+
+  auto id = generator.getId();
+  auto &task = remove_tasks[id];
 
   session->sendJsonPacket(generator);
 

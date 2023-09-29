@@ -23,8 +23,10 @@ Network::ScreenChannel::ScreenChannel(AbstractSession *session,
 Network::ScreenChannel::~ScreenChannel() {}
 
 bool Network::ScreenChannel::refresh(uint8_t compression_level) {
-  return session->sendJsonPacket(
-      Packet::Generator<Packet::RequestRemoteScreenSetArgs>(compression_level));
+  return session
+      ->sendJsonPacket(Packet::Generator<Packet::RequestRemoteScreenSetArgs>(
+          compression_level))
+      .has_value();
 }
 
 bool Network::ScreenChannel::sendMouse(

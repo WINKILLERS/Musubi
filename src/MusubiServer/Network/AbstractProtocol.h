@@ -3,7 +3,9 @@
 #include "Parser.h"
 #include "Protocols.h"
 #include "qobject.h"
+#include "qpromise.h"
 #include "unordered_map"
+#include <utility>
 
 namespace Network {
 // Forward declare
@@ -136,8 +138,9 @@ public:
   // Get remote port
   [[nodiscard]] virtual uint16_t getRemotePort() const noexcept = 0;
   // Send json packet
-  virtual bool
-  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept = 0;
+  std::optional<QFuture<std::pair<std::shared_ptr<Packet::Header>,
+                                  std::shared_ptr<Packet::AbstractPacket>>>>
+  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept;
   // Disconnect from remote
   virtual void shutdown() noexcept = 0;
   // Delete self
@@ -181,6 +184,9 @@ protected:
   // When received packet
   virtual bool onReceivedPacket(const std::string &buffer);
 
+  virtual bool
+  sendJsonPacketInternal(const Packet::AbstractGenerator &packet) noexcept = 0;
+
   // hwid for the session
   std::string hwid;
   std::string handshake_id;
@@ -194,5 +200,12 @@ private:
 
   // Current session status
   Status status = invalid;
+
+  // Pending packets
+  std::unordered_map<
+      std::string /*id*/,
+      QPromise<std::pair<std::shared_ptr<Packet::Header>,
+                         std::shared_ptr<Packet::AbstractPacket>>>>
+      pending_packets;
 };
 } // namespace Network

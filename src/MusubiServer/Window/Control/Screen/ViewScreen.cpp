@@ -73,6 +73,8 @@ Window::Control::ViewScreen::ViewScreen(Network::ScreenChannel *channel,
   spdlog::debug("initializing remote screen");
 
   ui->setupUi(this);
+
+  // Enable maximize button
   setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
 
   displayer = new ScreenDisplayer(this);

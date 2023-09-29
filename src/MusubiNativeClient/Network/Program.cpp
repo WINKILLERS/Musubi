@@ -29,8 +29,7 @@ bool Network::Program::onQuery(
     std::shared_ptr<Packet::AbstractPacket> param) noexcept {
   auto packet = std::dynamic_pointer_cast<Packet::RequestQueryProgram>(param);
 
-  auto generator =
-      Packet::Generator<Packet::ResponseQueryProgram>(queryProgram());
-  generator.setId(header->id);
-  return sendJsonPacket(generator);
+  return sendJsonPacket(
+      Packet::Generator<Packet::ResponseQueryProgram>(queryProgram())
+          .setId(header->id));
 }

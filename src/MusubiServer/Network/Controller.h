@@ -3,7 +3,6 @@
 #include "Protocols.h"
 #include "qfuture.h"
 
-
 namespace Network {
 // Forward declare
 class AbstractHandler;

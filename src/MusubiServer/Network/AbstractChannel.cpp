@@ -9,7 +9,7 @@
 
 Network::AbstractChannel::AbstractChannel(AbstractSession *session,
                                           AbstractChannel *parent)
-    : session(session), parent(parent), QObject(nullptr) {
+    : session(session), parent(parent), QObject(parent) {
   connect(&session->notifier, &IPacketNotify::lag, this, &AbstractChannel::lag);
 }
 
@@ -19,6 +19,8 @@ Network::AbstractChannel::~AbstractChannel() {
     window = nullptr;
   }
 
+  // Delete from memory
+  session->deleteSelf();
   session = nullptr;
 
   parent = nullptr;
@@ -44,6 +46,8 @@ Network::AbstractMultiChannel::~AbstractMultiChannel() {
   }
 
   sub_channels.clear();
+
+  pending_tasks.clear();
 }
 
 Network::AbstractChannel *Network::AbstractMultiChannel::getSubChannel(
@@ -67,8 +71,6 @@ Network::AbstractMultiChannel::requestOpenChannel(
     return promise.future();
   }
 
-  auto id = Packet::AbstractGenerator::getId();
-  bool send_ret = false;
   Packet::AbstractGenerator *generator;
 
   if (role == Packet::Handshake::Role::file) {
@@ -91,11 +93,11 @@ Network::AbstractMultiChannel::requestOpenChannel(
     return std::nullopt;
   }
 
-  generator->setId(id);
-  send_ret = session->sendJsonPacket(*generator);
+  auto id = generator->getId();
+  auto send_ret = session->sendJsonPacket(*generator);
   delete generator;
 
-  if (send_ret == false) {
+  if (send_ret.has_value() == false) {
     spdlog::error("can not send packet");
     return std::nullopt;
   }
@@ -144,5 +146,8 @@ bool Network::AbstractMultiChannel::addSubChannel(
 }
 
 void Network::AbstractMultiChannel::removeSubChannel(AbstractSession *session) {
+  auto sub_channel = getSubChannel(session->getRole());
+  sub_channel->deleteLater();
+
   sub_channels.erase(session->getRole());
 }

@@ -27,8 +27,7 @@ public:
 
 protected:
   // Send json packet
-  virtual bool
-  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept = 0;
+  bool sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept;
   // Wait until a packet received
   virtual std::optional<Packet::Parser> readJsonPacket() noexcept = 0;
 
@@ -45,6 +44,10 @@ protected:
                                          T_return (T_obj2::*func)(T_arg...));
 
 private:
+  // Send json packet
+  virtual bool
+  sendJsonPacketInternal(const Packet::AbstractGenerator &packet) noexcept = 0;
+
   // Invoke call back
   bool invoke(Packet::Type type, std::shared_ptr<Packet::Header> header,
               std::shared_ptr<Packet::AbstractPacket> packet) const noexcept;

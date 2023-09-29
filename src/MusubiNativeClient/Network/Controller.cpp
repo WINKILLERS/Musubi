@@ -37,14 +37,16 @@ bool Network::Controller::onInformation(
     std::shared_ptr<Packet::Header> header,
     std::shared_ptr<Packet::AbstractPacket> param) noexcept {
   return sendJsonPacket(
-      Packet::Generator<Packet::ResponseInformation>(getInformation()));
+      Packet::Generator<Packet::ResponseInformation>(getInformation())
+          .setId(header->id));
 }
 
 bool Network::Controller::onGetProcess(
     std::shared_ptr<Packet::Header> header,
     std::shared_ptr<Packet::AbstractPacket> param) noexcept {
   return sendJsonPacket(
-      Packet::Generator<Packet::ResponseGetProcess>(getProcess()));
+      Packet::Generator<Packet::ResponseGetProcess>(getProcess())
+          .setId(header->id));
 }
 
 bool Network::Controller::onHeartbeatChannel(

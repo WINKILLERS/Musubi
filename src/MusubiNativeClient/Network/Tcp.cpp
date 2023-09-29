@@ -40,7 +40,7 @@ void Network::TcpClient::shutdown() noexcept {
   }
 }
 
-bool Network::TcpClient::sendJsonPacket(
+bool Network::TcpClient::sendJsonPacketInternal(
     const Packet::AbstractGenerator &packet) noexcept {
   try {
     auto buffer = packet.buildJson();
