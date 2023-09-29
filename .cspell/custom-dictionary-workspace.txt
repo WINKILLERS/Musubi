@@ -4,6 +4,7 @@ CYSCREEN
 handshaked
 hwid
 INFOA
+kumihimo
 lukka
 Mitsuha
 MSVC
