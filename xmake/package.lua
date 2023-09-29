@@ -25,7 +25,6 @@ add_full_require("zstd")
 add_full_require("libsigcplusplus")
 add_full_require("infoware")
 add_full_require("spdlog")
-add_full_require("winreg")
 add_full_require("asio")
 add_full_require("xxhash")
 add_full_require("zlib")
@@ -39,5 +38,9 @@ add_full_require("jwt-cpp")
 add_full_require("http_parser")
 add_full_require("restinio")
 add_full_require("argparse")
+
+if is_plat("windows") then
+    add_full_require("winreg")
+end
 
 add_dynamic_require("qt6core","qt6gui","qt6network","qt6widgets")
