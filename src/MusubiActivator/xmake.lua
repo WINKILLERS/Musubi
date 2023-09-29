@@ -17,7 +17,7 @@ target("MusubiActivator")
 
     add_packages("spdlog~Dynamic")
     add_packages("openssl~Dynamic")
-    add_packages("vcpkg::jwt-cpp~Dynamic")
+    add_packages("jwt-cpp~Dynamic")
     add_packages("http_parser~Dynamic")
     add_packages("restinio~Dynamic")
     add_packages("nlohmann_json~Dynamic")
