@@ -6,6 +6,7 @@
 #include "InputChannel.h"
 #include "ProgramChannel.h"
 #include "ScreenChannel.h"
+#include "qeventloop.h"
 
 Network::AbstractChannel::AbstractChannel(AbstractSession *session,
                                           AbstractChannel *parent)
@@ -15,6 +16,7 @@ Network::AbstractChannel::AbstractChannel(AbstractSession *session,
 
 Network::AbstractChannel::~AbstractChannel() {
   if (window != nullptr) {
+    window->close();
     window->deleteLater();
     window = nullptr;
   }

@@ -105,7 +105,9 @@ Window::Control::ViewScreen::ViewScreen(Network::ScreenChannel *channel,
   connect(channel, &Network::ScreenChannel::rectChanged, displayer,
           &Window::Control::ScreenDisplayer::updateScreen);
 
-  startTimer(20);
+  connect(channel, &QObject::destroyed, this, [this]() { killTimer(timer); });
+
+  timer = startTimer(20);
 }
 
 Window::Control::ViewScreen::~ViewScreen() {

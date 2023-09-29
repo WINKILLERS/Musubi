@@ -71,6 +71,8 @@ private:
   std::vector<Packet::RequestSetMouse::MouseInput> mouse_inputs;
   std::vector<Packet::RequestSetKeyboard::KeyBoardInput> keyboard_inputs;
 
+  int timer = 0;
+
   void onMouseMovedRefresh(double x_percentage, double y_percentage);
   void onMousePressedRefresh(double x_percentage, double y_percentage,
                              uint8_t button);
