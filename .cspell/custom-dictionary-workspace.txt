@@ -3,7 +3,9 @@ CXSCREEN
 CYSCREEN
 handshaked
 hwid
+lukka
 Mitsuha
+MSVC
 Musubi
 Pixmap
 qintptr
@@ -13,3 +15,5 @@ spinbox
 SRCCOPY
 Subchannel
 unhandshaked
+vcpkg
+xmake
