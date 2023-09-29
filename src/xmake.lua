@@ -1,4 +1,8 @@
 includes("MusubiActivator")
 includes("MusubiBridge")
-includes("MusubiNativeClient")
+
+if is_plat("windows") then
+    includes("MusubiNativeClient")
+end 
+
 includes("MusubiServer")
