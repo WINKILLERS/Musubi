@@ -10,8 +10,8 @@
 
 class ScreenCapturer {
 public:
-  ScreenCapturer(uint16_t bit_count = 16, uint32_t chunk_width = 120,
-                 uint32_t chunk_height = 120);
+  ScreenCapturer(uint16_t bit_count = 16, uint32_t chunk_width = 480,
+                 uint32_t chunk_height = 360);
   ~ScreenCapturer();
 
   std::optional<std::vector<Packet::ResponseRemoteScreen::ScreenRect>>

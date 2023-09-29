@@ -2,6 +2,11 @@
 #include "AApch.h"
 #include "Protocols.h"
 
+#define CASE_AND_PARSE(pt)                                                     \
+  case (Packet::Type)pt::PacketType:                                           \
+    body = std::make_shared<pt>();                                             \
+    break;
+
 Packet::Parser::~Parser() {}
 
 bool Packet::Parser::parseJson(const std::string &buffer) {
@@ -37,117 +42,44 @@ bool Packet::Parser::parseJson(const std::string &header_buffer,
 
   if (body == nullptr)
     switch (header->type) {
-    case Type::request_heartbeat_channel:
-      body = std::make_shared<RequestHeartbeatChannel>();
-      break;
-    case Type::response_heartbeat:
-      body = std::make_shared<ResponseHeartbeat>();
-      break;
-    case Type::handshake:
-      body = std::make_shared<Handshake>();
-      break;
-    case Type::request_information:
-      body = std::make_shared<RequestInformation>();
-      break;
-    case Type::response_information:
-      body = std::make_shared<ResponseInformation>();
-      break;
-    case Type::request_upload_file:
-      body = std::make_shared<RequestUploadFile>();
-      break;
-    case Type::response_upload_file:
-      body = std::make_shared<ResponseUploadFile>();
-      break;
-    case Type::request_download_file:
-      body = std::make_shared<RequestDownloadFile>();
-      break;
-    case Type::response_download_file:
-      body = std::make_shared<ResponseDownloadFile>();
-      break;
-    case Type::request_query_file:
-      body = std::make_shared<RequestQueryFile>();
-      break;
-    case Type::response_query_file:
-      body = std::make_shared<ResponseQueryFile>();
-      break;
-    case Type::request_delete_file:
-      body = std::make_shared<RequestDeleteFile>();
-      break;
-    case Type::response_delete_file:
-      body = std::make_shared<ResponseDeleteFile>();
-      break;
-    case Type::request_get_process:
-      body = std::make_shared<RequestGetProcess>();
-      break;
-    case Type::response_get_process:
-      body = std::make_shared<ResponseGetProcess>();
-      break;
-    case Type::request_terminate_process:
-      body = std::make_shared<RequestTerminateProcess>();
-      break;
-    case Type::response_terminate_process:
-      body = std::make_shared<ResponseTerminateProcess>();
-      break;
-    case Type::request_start_process:
-      body = std::make_shared<RequestStartProcess>();
-      break;
-    case Type::response_start_process:
-      body = std::make_shared<ResponseStartProcess>();
-      break;
-    case Type::request_execute_file:
-      body = std::make_shared<RequestExecuteFile>();
-      break;
-    case Type::response_execute_file:
-      body = std::make_shared<ResponseExecuteFile>();
-      break;
-    case Type::request_screen_channel:
-      body = std::make_shared<RequestScreenChannel>();
-      break;
-    case Type::request_remote_screen_set_args:
-      body = std::make_shared<RequestRemoteScreenSetArgs>();
-      break;
-    case Type::response_remote_screen:
-      body = std::make_shared<ResponseRemoteScreen>();
-      break;
-    case Type::request_set_mouse:
-      body = std::make_shared<RequestSetMouse>();
-      break;
-    case Type::request_set_keyboard:
-      body = std::make_shared<RequestSetKeyboard>();
-      break;
-    case Type::request_file_channel:
-      body = std::make_shared<RequestFileChannel>();
-      break;
-    case Type::request_task_autostart:
-      body = std::make_shared<RequestTaskAutoStart>();
-      break;
-    case Type::response_task_autostart:
-      body = std::make_shared<ResponseTaskAutoStart>();
-      break;
-    case Type::request_disconnect:
-      body = std::make_shared<Disconnect>();
-      break;
-    case Type::request_reinitialize:
-      body = std::make_shared<RequestReinitialize>();
-      break;
-    case Type::response_reinitialize:
-      body = std::make_shared<ResponseReinitialize>();
-      break;
-    case Type::request_keyboard_monitor_channel:
-      body = std::make_shared<RequestKeyboardMonitorChannel>();
-      break;
-    case Type::response_get_key:
-      body = std::make_shared<ResponseGetKey>();
-      break;
-    case Type::request_query_program:
-      body = std::make_shared<RequestQueryProgram>();
-      break;
-    case Type::response_query_program:
-      body = std::make_shared<ResponseQueryProgram>();
-      break;
-    case Type::request_program_channel:
-      body = std::make_shared<RequestProgramChannel>();
-      break;
+      CASE_AND_PARSE(RequestHeartbeatChannel);
+      CASE_AND_PARSE(ResponseHeartbeat);
+      CASE_AND_PARSE(Handshake);
+      CASE_AND_PARSE(RequestInformation);
+      CASE_AND_PARSE(ResponseInformation);
+      CASE_AND_PARSE(RequestUploadFile);
+      CASE_AND_PARSE(ResponseUploadFile);
+      CASE_AND_PARSE(RequestDownloadFile);
+      CASE_AND_PARSE(ResponseDownloadFile);
+      CASE_AND_PARSE(RequestQueryFile);
+      CASE_AND_PARSE(ResponseQueryFile);
+      CASE_AND_PARSE(RequestDeleteFile);
+      CASE_AND_PARSE(ResponseDeleteFile);
+      CASE_AND_PARSE(RequestGetProcess);
+      CASE_AND_PARSE(ResponseGetProcess);
+      CASE_AND_PARSE(RequestTerminateProcess);
+      CASE_AND_PARSE(ResponseTerminateProcess);
+      CASE_AND_PARSE(RequestStartProcess);
+      CASE_AND_PARSE(ResponseStartProcess);
+      CASE_AND_PARSE(RequestExecuteFile);
+      CASE_AND_PARSE(ResponseExecuteFile);
+      CASE_AND_PARSE(RequestScreenChannel);
+      CASE_AND_PARSE(RequestRemoteScreenSetArgs);
+      CASE_AND_PARSE(ResponseRemoteScreen);
+      CASE_AND_PARSE(RequestSetMouse);
+      CASE_AND_PARSE(RequestSetKeyboard);
+      CASE_AND_PARSE(RequestFileChannel);
+      CASE_AND_PARSE(RequestTaskAutoStart);
+      CASE_AND_PARSE(ResponseTaskAutoStart);
+      CASE_AND_PARSE(Disconnect);
+      CASE_AND_PARSE(RequestReinitialize);
+      CASE_AND_PARSE(ResponseReinitialize);
+      CASE_AND_PARSE(RequestKeyboardMonitorChannel);
+      CASE_AND_PARSE(ResponseGetKey);
+      CASE_AND_PARSE(RequestQueryProgram);
+      CASE_AND_PARSE(ResponseQueryProgram);
+      CASE_AND_PARSE(RequestProgramChannel);
+      CASE_AND_PARSE(RequestRemoteScreenSync);
     case Type::header:
     case Type::unknown:
     default:

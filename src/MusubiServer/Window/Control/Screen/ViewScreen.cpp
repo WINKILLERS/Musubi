@@ -2,8 +2,13 @@
 #include "AApch.h"
 #include "Network/ScreenChannel.h"
 #include "qevent.h"
+#include "qimage.h"
 #include "qobject.h"
 #include "qpainter.h"
+#include "qpixmap.h"
+#include "spdlog/spdlog.h"
+#include "spdlog/stopwatch.h"
+#include <vcruntime_string.h>
 
 Window::Control::ScreenDisplayer::ScreenDisplayer(QWidget *parent)
     : QWidget(parent) {
@@ -13,24 +18,37 @@ Window::Control::ScreenDisplayer::ScreenDisplayer(QWidget *parent)
 Window::Control::ScreenDisplayer::~ScreenDisplayer() {}
 
 void Window::Control::ScreenDisplayer::updateScreen(
-    QRect rect_, const std::string &buffer_) {
-  rect = rect_;
-  buffer = buffer_;
+    QRect rect, const std::string &buffer_) {
+
+  if (frame.isNull()) {
+    // If it is first frame
+    buffer = std::move(buffer_);
+    screen_rect = rect;
+  } else {
+    // Or draw different area
+    auto bytesPerLine = buffer_.size() / rect.height();
+    auto bytesPerPixel = bytesPerLine / rect.width();
+    for (uint32_t y_in_chunk = 0; y_in_chunk < rect.height(); y_in_chunk++) {
+      auto y_in_raw = rect.y() + y_in_chunk;
+      auto pos_in_raw =
+          buffer.data() +
+          (y_in_raw * screen_rect.width() + rect.x()) * bytesPerPixel;
+      auto pos_in_chunk =
+          buffer_.data() + (y_in_chunk * rect.width()) * bytesPerPixel;
+      memcpy(pos_in_raw, pos_in_chunk, bytesPerLine);
+    }
+  }
+
+  frame = QImage((uint8_t *)buffer.data(), screen_rect.width(),
+                 screen_rect.height(), QImage::Format_RGB555);
 
   repaint();
 }
 
 void Window::Control::ScreenDisplayer::paintEvent(QPaintEvent *ev) {
-  if (buffer.empty()) {
-    return;
-  }
-
   QPainter painter(this);
-
-  QImage frame((uint8_t *)buffer.data(), rect.width(), rect.height(),
-               QImage::Format_RGB16);
-  painter.drawPixmap(rect.x(), rect.y(), rect.width(), rect.height(),
-                     QPixmap::fromImage(frame));
+  painter.drawImage(screen_rect, frame);
+  emit updateComplete();
 }
 
 void Window::Control::ScreenDisplayer::mouseMoveEvent(QMouseEvent *ev) {
@@ -104,6 +122,8 @@ Window::Control::ViewScreen::ViewScreen(Network::ScreenChannel *channel,
 
   connect(channel, &Network::ScreenChannel::rectChanged, displayer,
           &Window::Control::ScreenDisplayer::updateScreen);
+  connect(displayer, &Window::Control::ScreenDisplayer::updateScreen, this,
+          &Window::Control::ViewScreen::refresh);
 
   connect(channel, &QObject::destroyed, this, [this]() { killTimer(timer); });
 
@@ -117,7 +137,11 @@ Window::Control::ViewScreen::~ViewScreen() {
   delete ui;
 }
 
-void Window::Control::ViewScreen::refresh() {
+void Window::Control::ViewScreen::refresh() { channel->sendSync(); }
+
+void Window::Control::ViewScreen::timerEvent(QTimerEvent *ev) { sendInput(); }
+
+void Window::Control::ViewScreen::sendInput() {
   bool send_input = ui->enable_input->isChecked();
   channel->setInputEnabled(send_input);
 
@@ -144,8 +168,6 @@ void Window::Control::ViewScreen::refresh() {
     keyboard_inputs.clear();
   }
 }
-
-void Window::Control::ViewScreen::timerEvent(QTimerEvent *ev) { refresh(); }
 
 void Window::Control::ViewScreen::onMouseMovedRefresh(double x_percentage,
                                                       double y_percentage) {
@@ -256,5 +278,5 @@ void Window::Control::ViewScreen::changeConfiguration() {
   auto compression_level = ui->level_spinbox->value();
   spdlog::debug("compression level set to {}", compression_level);
 
-  channel->refresh(compression_level);
+  channel->setArgs(compression_level);
 }

@@ -58,13 +58,8 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::request_disconnect;
-  }
-
-  inline bool operator==(const Disconnect &other) const {
-    return action == other.action;
-  }
+  enum { PacketType = (uint32_t)Type::request_disconnect };
+  inline Type getType() const override final { return (Type)PacketType; }
 };
 
 class RequestReinitialize : public AbstractPacket {

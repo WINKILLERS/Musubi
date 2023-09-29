@@ -39,10 +39,8 @@ Network::FileChannel::~FileChannel() {
 }
 
 bool Network::FileChannel::refresh() {
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryFile>(
-          current_directory.u8string()))
-      .has_value();
+  return session->sendJsonPacket(Packet::Generator<Packet::RequestQueryFile>(
+      current_directory.u8string()));
 }
 
 bool Network::FileChannel::open(const std::string &directory_name) {
@@ -302,12 +300,12 @@ std::string Network::FileChannel::getCurrentDirectory() const {
   return utf8to8(current_directory.u8string());
 }
 
-bool Network::FileChannel::showWindow(QWidget *parent) {
+bool Network::FileChannel::showWindow() noexcept {
   if (window == nullptr) {
-    window = new Window::Control::ViewFile(this, parent);
+    window = new Window::Control::ViewFile(this, nullptr);
   }
 
-  return AbstractChannel::showWindow(parent);
+  return AbstractChannel::showWindow();
 }
 
 void Network::FileChannel::downloadCompleted(

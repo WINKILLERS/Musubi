@@ -37,7 +37,7 @@ void Network::TcpHandler::onSessionDisconnected() {
 
 Network::TcpSession::TcpSession(int32_t socket_descriptor,
                                 Network::TcpHandler *handler)
-    : AbstractSession(handler), QTcpSocket(handler) {
+    : AbstractSession(handler), QTcpSocket(nullptr) {
   // Connect socket
   setSocketDescriptor(socket_descriptor);
 

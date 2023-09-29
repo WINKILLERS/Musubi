@@ -190,4 +190,12 @@ public:
 private:
   uint8_t compress_level;
 };
+
+class RequestRemoteScreenSync : public AbstractPacket {
+public:
+  RequestRemoteScreenSync() = default;
+
+  enum { PacketType = (uint32_t)Type::request_remote_screen_sync };
+  inline Type getType() const override final { return (Type)PacketType; }
+};
 } // namespace Packet

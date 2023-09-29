@@ -22,11 +22,9 @@ Network::ScreenChannel::ScreenChannel(AbstractSession *session,
 
 Network::ScreenChannel::~ScreenChannel() {}
 
-bool Network::ScreenChannel::refresh(uint8_t compression_level) {
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestRemoteScreenSetArgs>(
-          compression_level))
-      .has_value();
+bool Network::ScreenChannel::setArgs(uint8_t compression_level) {
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestRemoteScreenSetArgs>(compression_level));
 }
 
 bool Network::ScreenChannel::sendMouse(
@@ -60,12 +58,17 @@ void Network::ScreenChannel::setInputEnabled(bool is_enable) {
   }
 }
 
-bool Network::ScreenChannel::showWindow(QWidget *parent) {
+bool Network::ScreenChannel::sendSync() {
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestRemoteScreenSync>());
+}
+
+bool Network::ScreenChannel::showWindow() noexcept {
   if (window == nullptr) {
-    window = new Window::Control::ViewScreen(this, parent);
+    window = new Window::Control::ViewScreen(this, nullptr);
   }
 
-  return AbstractChannel::showWindow(parent);
+  return AbstractChannel::showWindow();
 }
 
 void Network::ScreenChannel::update(

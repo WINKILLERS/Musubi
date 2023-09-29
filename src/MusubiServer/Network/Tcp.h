@@ -33,7 +33,7 @@ private:
   const uint16_t port = default_port;
 };
 
-class TcpSession : public QTcpSocket, public AbstractSession {
+class TcpSession final : public QTcpSocket, public AbstractSession {
   Q_OBJECT
 
 public:
@@ -45,12 +45,15 @@ public:
   virtual ~TcpSession();
 
   // AbstractSession implementation
-  virtual std::string getRemoteAddress() const noexcept override {
+  [[nodiscard]] virtual std::string getRemoteAddress() const noexcept override {
     return peerAddress().toString().toStdString();
   }
-  virtual uint16_t getRemotePort() const noexcept override {
+  [[nodiscard]] virtual uint16_t getRemotePort() const noexcept override {
     return peerPort();
   }
+  [[nodiscard]] virtual Type getType() const noexcept override {
+    return Type::tcp;
+  };
   virtual bool sendJsonPacketInternal(
       const Packet::AbstractGenerator &packet) noexcept override;
   virtual void shutdown() noexcept override;

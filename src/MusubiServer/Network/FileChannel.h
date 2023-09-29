@@ -91,7 +91,7 @@ public slots:
   std::vector<Packet::File> getFiles() const noexcept { return files; }
   std::string getCurrentDirectory() const;
 
-  bool showWindow(QWidget *parent = nullptr) override;
+  bool showWindow() noexcept override;
 
 private slots:
   void update(std::shared_ptr<Packet::Header> header,

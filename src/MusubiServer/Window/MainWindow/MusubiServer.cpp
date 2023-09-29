@@ -6,6 +6,8 @@
 #include "Window/Control/Program/ViewProgram.h"
 #include "qheaderview.h"
 #include "qmessagebox.h"
+#include "qthread.h"
+#include "spdlog/spdlog.h"
 
 Window::MainWindow::MusubiServer::MusubiServer(Setting *setting,
                                                QWidget *parent)
@@ -15,7 +17,10 @@ Window::MainWindow::MusubiServer::MusubiServer(Setting *setting,
 
   ui->setupUi(this);
 
-  spdlog::info("setting up handler");
+  spdlog::info("setting up handler pool");
+  handler_pool = new QThread(this);
+
+  spdlog::info("setting up tcp handler");
   handler = new Network::TcpHandler(setting->getPort(), this);
   if (handler->listen() == false) {
     spdlog::error("listen address error, resetting");
@@ -25,6 +30,7 @@ Window::MainWindow::MusubiServer::MusubiServer(Setting *setting,
                              "or restart computer"));
     return;
   }
+  handler->moveToThread(handler_pool);
 
   spdlog::info("setting up client view");
   client_view = new View::Client::ClientView(this);
@@ -123,7 +129,7 @@ bool Window::MainWindow::MusubiServer::openSubchannel(
 
   auto request = std::move(request_ret.value());
   request.then([this](Network::AbstractChannel *sub_channel) {
-    sub_channel->showWindow(this);
+    sub_channel->showWindow();
   });
 
   return true;

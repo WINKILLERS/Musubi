@@ -44,15 +44,13 @@ std::string Network::Controller::getRemoteAddress() const {
 std::string Network::Controller::getHwid() const { return session->getHwid(); }
 
 bool Network::Controller::requestInformation() {
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestInformation>())
-      .has_value();
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestInformation>());
 }
 
 bool Network::Controller::requestProgram() {
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryProgram>())
-      .has_value();
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestQueryProgram>());
 }
 
 void Network::Controller::onInformation(

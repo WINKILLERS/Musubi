@@ -1,5 +1,6 @@
 #include "Screen.h"
 #include "AApch.h"
+#include <complex>
 #include <optional>
 
 ScreenCapturer::ScreenCapturer(uint16_t bit_count, uint32_t chunk_width,
@@ -148,14 +149,14 @@ ScreenCapturer::getDiff() {
         auto hash = getRectHash(x, y);
 
         // The chunk changed
-        const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
+        const auto &bytesPerPixel = bmi->bmiHeader.biBitCount / 8;
         if (prev_buffers[x][y].hash != hash) {
           Packet::ResponseRemoteScreen::ScreenRect rect;
           rect.x = x * chunk_width;
           rect.y = y * chunk_height;
           rect.width = prev_buffers[x][y].chunk_width;
           rect.height = prev_buffers[x][y].chunk_height;
-          rect.screen.resize(rect.width * rect.height * bitsPerPixel);
+          rect.screen.resize(rect.width * rect.height * bytesPerPixel);
           copyRectTo(x, y, rect.screen.data());
           rects.push_back(rect);
 
@@ -184,7 +185,8 @@ bool ScreenCapturer::ConstructBI(uint16_t biBitCount, uint32_t biWidth,
   BITMAPINFOHEADER *bmih = &bmi->bmiHeader;
   bmih->biSize = sizeof(BITMAPINFOHEADER);
   bmih->biWidth = biWidth;
-  bmih->biHeight = biHeight;
+  // Top-down image
+  bmih->biHeight = -biHeight;
   bmih->biPlanes = 1;
   bmih->biBitCount = biBitCount;
   bmih->biCompression = BI_RGB;
@@ -192,8 +194,8 @@ bool ScreenCapturer::ConstructBI(uint16_t biBitCount, uint32_t biWidth,
   bmih->biYPelsPerMeter = 0;
   bmih->biClrUsed = 0;
   bmih->biClrImportant = 0;
-  bmih->biSizeImage =
-      (((bmih->biWidth * bmih->biBitCount + 31) & ~31) >> 3) * bmih->biHeight;
+  bmih->biSizeImage = (((bmih->biWidth * bmih->biBitCount + 31) & ~31) >> 3) *
+                      std::abs(bmih->biHeight);
 
   if (biBitCount >= 16) {
     return true;
@@ -223,9 +225,9 @@ bool ScreenCapturer::ConstructBI(uint16_t biBitCount, uint32_t biWidth,
 }
 
 XXH64_hash_t ScreenCapturer::getRectHash(uint32_t x, uint32_t y) {
-  const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
+  const auto &bytesPerPixel = bmi->bmiHeader.biBitCount / 8;
   auto buffer_size = prev_buffers[x][y].chunk_width *
-                     prev_buffers[x][y].chunk_height * bitsPerPixel;
+                     prev_buffers[x][y].chunk_height * bytesPerPixel;
   char *buffer = new char[buffer_size];
 
   // Copy rect
@@ -241,18 +243,18 @@ XXH64_hash_t ScreenCapturer::getRectHash(uint32_t x, uint32_t y) {
 
 void ScreenCapturer::copyRectTo(uint32_t x, uint32_t y, void *dest) {
   // Start copying from original buffer
-  const auto &bitsPerPixel = bmi->bmiHeader.biBitCount;
+  const auto &bytesPerPixel = bmi->bmiHeader.biBitCount / 8;
   auto line_scanned = 0;
   auto current_original_pos =
       (char *)full_buffer +
-      (y * chunk_height * screen_width + x * chunk_width) * bitsPerPixel;
+      (y * chunk_height * screen_width + x * chunk_width) * bytesPerPixel;
   auto current_chunk_pos = (char *)dest;
   do {
     memcpy(current_chunk_pos, current_original_pos,
-           prev_buffers[x][y].chunk_width * bitsPerPixel);
+           prev_buffers[x][y].chunk_width * bytesPerPixel);
 
-    current_chunk_pos += prev_buffers[x][y].chunk_width * bitsPerPixel;
-    current_original_pos += screen_width * bitsPerPixel;
+    current_chunk_pos += prev_buffers[x][y].chunk_width * bytesPerPixel;
+    current_original_pos += screen_width * bytesPerPixel;
     line_scanned++;
   } while (line_scanned < prev_buffers[x][y].chunk_height);
 }
@@ -263,11 +265,19 @@ void Network::Screen::run() noexcept {
   performHandshake(Packet::Handshake::Role::remote_screen);
 
   while (true) {
-    while (true) {
-      if (sendFrame() == false) {
+    std::optional<Packet::Parser> parser;
+
+    if (sendFrame() == false) {
+      return;
+    }
+
+    do {
+      parser = readJsonPacket();
+
+      if (parser.has_value() == false) {
         return;
       }
-    }
+    } while (parser->header->type != Packet::Type::request_remote_screen_sync);
   }
 }
 

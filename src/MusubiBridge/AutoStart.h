@@ -4,7 +4,7 @@
 namespace Packet {
 class RequestTaskAutoStart : public AbstractPacket {
 public:
-  enum TaskType {
+  enum class TaskType {
     com_default_system,
     com_default_current_user,
   };

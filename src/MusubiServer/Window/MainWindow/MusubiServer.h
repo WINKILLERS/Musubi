@@ -2,6 +2,7 @@
 #include "License.h"
 #include "Model/Client/ClientModel.h"
 #include "Network/AbstractProtocol.h"
+#include "Network/Tcp.h"
 #include "Setting.h"
 #include "View/Client/ClientView.h"
 #include "qlabel.h"
@@ -32,7 +33,8 @@ private:
 
   Ui::MusubiServerClass *ui = nullptr;
 
-  Network::AbstractHandler *handler = nullptr;
+  Network::TcpHandler *handler = nullptr;
+  QThread *handler_pool = nullptr;
 
   View::Client::ClientView *client_view = nullptr;
   Model::Client::ClientModel *client_model = nullptr;

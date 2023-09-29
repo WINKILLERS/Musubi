@@ -1,6 +1,10 @@
 #pragma once
 #include "Protocols.h"
 #include "qdialog.h"
+#include "qimage.h"
+#include "qpainter.h"
+#include "qpixmap.h"
+#include "qtmetamacros.h"
 #include "ui_ViewScreen.h"
 
 // Forward declare
@@ -29,8 +33,11 @@ signals:
   void keyPressed(int virtual_code);
   void keyReleased(int virtual_code);
 
+signals:
+  void updateComplete();
+
 public slots:
-  void updateScreen(QRect rect_, const std::string &buffer_);
+  void updateScreen(QRect rect, const std::string &buffer_);
 
 protected:
   void paintEvent(QPaintEvent *ev) override;
@@ -45,8 +52,9 @@ protected:
   void keyReleaseEvent(QKeyEvent *ev) override;
 
 private:
-  QRect rect;
+  QRect screen_rect;
   std::string buffer;
+  QImage frame;
 };
 
 class ViewScreen : public QDialog {
@@ -63,6 +71,8 @@ protected:
   void timerEvent(QTimerEvent *ev) override;
 
 private:
+  void sendInput();
+
   Ui::ViewScreen *ui;
   Network::ScreenChannel *channel = nullptr;
   ScreenDisplayer *displayer = nullptr;

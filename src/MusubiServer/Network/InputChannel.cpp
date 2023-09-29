@@ -14,9 +14,8 @@ bool Network::InputChannel::sendMouse(
     return true;
   }
 
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestSetMouse>(mouse_inputs))
-      .has_value();
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestSetMouse>(mouse_inputs));
 }
 
 bool Network::InputChannel::sendKeyboard(
@@ -26,8 +25,6 @@ bool Network::InputChannel::sendKeyboard(
     return true;
   }
 
-  return session
-      ->sendJsonPacket(
-          Packet::Generator<Packet::RequestSetKeyboard>(keyboard_inputs))
-      .has_value();
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestSetKeyboard>(keyboard_inputs));
 }

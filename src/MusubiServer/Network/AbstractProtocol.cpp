@@ -9,7 +9,7 @@
 #define CASE_AND_EMIT(pt, sig)                                                 \
   case (Packet::Type)pt::PacketType:                                           \
     emit sig(parser.header, std::dynamic_pointer_cast<pt>(parser.body));       \
-    break;
+    break
 
 void Network::IPacketNotify::dispatch(const Packet::Parser &parser) {
   auto type = parser.header->type;
@@ -222,27 +222,17 @@ Network::AbstractSession::~AbstractSession() {
 
   handler = nullptr;
 
-  status = invalid;
+  status = Status::invalid;
 
   role = Packet::Handshake::Role::invalid;
 
   hwid.clear();
   handshake_id.clear();
-  pending_packets.clear();
 }
 
-std::optional<QFuture<std::pair<std::shared_ptr<Packet::Header>,
-                                std::shared_ptr<Packet::AbstractPacket>>>>
-Network::AbstractSession::sendJsonPacket(
+bool Network::AbstractSession::sendJsonPacket(
     const Packet::AbstractGenerator &packet) noexcept {
-  auto id = packet.getId();
-
-  if (sendJsonPacketInternal(packet) == true) {
-    auto &task = pending_packets[id];
-    return task.future();
-  } else {
-    return std::nullopt;
-  }
+  return sendJsonPacketInternal(packet);
 }
 
 bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
@@ -256,10 +246,10 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
   auto type = parser.header->type;
   const auto &id = parser.header->id;
 
-  spdlog::debug(
-      "received packet in session {} with type: {}, id: {} in raw size: {} kb",
-      fmt::ptr(this), magic_enum::enum_name(type), id,
-      (double)buffer.size() / 1024);
+  spdlog::debug("received packet in session {} with type: {}, id: {} in raw "
+                "size: {} kb",
+                fmt::ptr(this), magic_enum::enum_name(type), id,
+                (double)buffer.size() / 1024);
 
   if (type == Packet::Type::handshake) {
     // If session is initialized, reject all re-initialization
@@ -288,7 +278,7 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
     }
 
     // Once all initialization operation completed, flag our session
-    setStatus(handshaked);
+    setStatus(Status::handshaked);
 
     // After our initialization, call the handler to evaluate us
     handler->migratePendingSession(this);
@@ -301,14 +291,6 @@ bool Network::AbstractSession::onReceivedPacket(const std::string &buffer) {
     spdlog::error("sending request before initialization");
     shutdown();
     return false;
-  }
-
-  try {
-    auto packet = std::move(pending_packets.at(id));
-    pending_packets.erase(id);
-    packet.addResult(std::make_pair(parser.header, parser.body));
-    packet.finish();
-  } catch (const std::exception &) {
   }
 
   try {

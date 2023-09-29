@@ -16,7 +16,7 @@ public:
   AbstractChannel(AbstractSession *session, AbstractChannel *parent);
   virtual ~AbstractChannel();
 
-  virtual bool showWindow(QWidget *parent = nullptr);
+  virtual bool showWindow() noexcept;
 
 signals:
   void lag(uint32_t lag);
@@ -40,7 +40,7 @@ public:
   virtual ~AbstractMultiChannel();
 
   // Get sub channel by given role
-  AbstractChannel *getSubChannel(Packet::Handshake::Role role) const;
+  AbstractChannel *getSubChannel(Packet::Handshake::Role role) const noexcept;
 
   // Request remote to open a channel by given role
   std::optional<QFuture<AbstractChannel *>>

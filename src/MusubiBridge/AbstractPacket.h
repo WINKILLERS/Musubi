@@ -48,12 +48,13 @@ enum class Type : uint8_t {
   request_screen_channel,
   request_heartbeat_channel,
   request_input_channel,
+  request_remote_screen_sync
 };
 
 class AbstractPacket {
 public:
-  virtual std::string buildJson() const = 0;
-  virtual void parseJson(const std::string &buffer) = 0;
+  virtual std::string buildJson() const;
+  virtual void parseJson(const std::string &buffer);
 
   virtual Type getType() const = 0;
 };

@@ -2,10 +2,13 @@
 #include "Generator.h"
 #include "Parser.h"
 #include "Protocols.h"
+#include "magic_enum.hpp"
 #include "qobject.h"
 #include "qpromise.h"
 #include "unordered_map"
 #include <utility>
+
+using namespace magic_enum::bitwise_operators;
 
 namespace Network {
 // Forward declare
@@ -123,11 +126,15 @@ private:
 
 class AbstractSession {
 public:
-  enum Status : uint8_t {
+  enum class Status : uint8_t {
     invalid = 0,
     handshaked = 1,
     reversed1 = 2,
     reversed2 = 4,
+  };
+
+  enum class Type : uint8_t {
+    tcp,
   };
 
   AbstractSession(AbstractHandler *handler);
@@ -137,10 +144,10 @@ public:
   [[nodiscard]] virtual std::string getRemoteAddress() const noexcept = 0;
   // Get remote port
   [[nodiscard]] virtual uint16_t getRemotePort() const noexcept = 0;
+  // Get type
+  [[nodiscard]] virtual Type getType() const noexcept = 0;
   // Send json packet
-  std::optional<QFuture<std::pair<std::shared_ptr<Packet::Header>,
-                                  std::shared_ptr<Packet::AbstractPacket>>>>
-  sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept;
+  bool sendJsonPacket(const Packet::AbstractGenerator &packet) noexcept;
   // Disconnect from remote
   virtual void shutdown() noexcept = 0;
   // Delete self
@@ -156,11 +163,11 @@ public:
   [[nodiscard]] inline Status getStatus() const noexcept { return status; }
   // Check if the session is invalid
   [[nodiscard]] inline bool isInvalid() const noexcept {
-    return status == invalid;
+    return status == Status::invalid;
   }
   // Check if the session is handshaked
   [[nodiscard]] inline bool isHandshaked() const noexcept {
-    return status & handshaked;
+    return (status & Status::handshaked) == Status::handshaked;
   }
   // Is the session a controller
   [[nodiscard]] inline bool isController() const noexcept {
@@ -178,9 +185,9 @@ public:
 
 protected:
   // Set one status
-  inline void setStatus(Status status_) { status = (Status)(status | status_); }
+  inline void setStatus(Status status_) { status = status | status_; }
   // Clear status
-  inline void clearStatus(Status status_) { status = invalid; }
+  inline void clearStatus(Status status_) { status = Status::invalid; }
   // When received packet
   virtual bool onReceivedPacket(const std::string &buffer);
 
@@ -199,13 +206,6 @@ private:
   AbstractHandler *handler = nullptr;
 
   // Current session status
-  Status status = invalid;
-
-  // Pending packets
-  std::unordered_map<
-      std::string /*id*/,
-      QPromise<std::pair<std::shared_ptr<Packet::Header>,
-                         std::shared_ptr<Packet::AbstractPacket>>>>
-      pending_packets;
+  Status status = Status::invalid;
 };
 } // namespace Network

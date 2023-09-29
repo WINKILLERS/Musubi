@@ -16,7 +16,6 @@ Network::AbstractChannel::AbstractChannel(AbstractSession *session,
 
 Network::AbstractChannel::~AbstractChannel() {
   if (window != nullptr) {
-    window->close();
     window->deleteLater();
     window = nullptr;
   }
@@ -28,7 +27,7 @@ Network::AbstractChannel::~AbstractChannel() {
   parent = nullptr;
 }
 
-bool Network::AbstractChannel::showWindow(QWidget *parent) {
+bool Network::AbstractChannel::showWindow() noexcept {
   // If we have no window
   if (window == nullptr) {
     return false;
@@ -53,7 +52,7 @@ Network::AbstractMultiChannel::~AbstractMultiChannel() {
 }
 
 Network::AbstractChannel *Network::AbstractMultiChannel::getSubChannel(
-    Packet::Handshake::Role role) const {
+    Packet::Handshake::Role role) const noexcept {
   try {
     return sub_channels.at(role);
   } catch (const std::exception &) {
@@ -99,7 +98,7 @@ Network::AbstractMultiChannel::requestOpenChannel(
   auto send_ret = session->sendJsonPacket(*generator);
   delete generator;
 
-  if (send_ret.has_value() == false) {
+  if (send_ret == false) {
     spdlog::error("can not send packet");
     return std::nullopt;
   }

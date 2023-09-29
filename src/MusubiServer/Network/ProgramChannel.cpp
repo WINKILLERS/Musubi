@@ -21,9 +21,8 @@ Network::ProgramChannel::ProgramChannel(AbstractSession *session,
 Network::ProgramChannel::~ProgramChannel() {}
 
 bool Network::ProgramChannel::refresh() {
-  return session
-      ->sendJsonPacket(Packet::Generator<Packet::RequestQueryProgram>())
-      .has_value();
+  return session->sendJsonPacket(
+      Packet::Generator<Packet::RequestQueryProgram>());
 }
 
 bool Network::ProgramChannel::openInViewFile(const std::wstring &path) {
@@ -56,12 +55,12 @@ std::optional<std::string> Network::ProgramChannel::getCurrentUser() const {
   return information->user_name;
 }
 
-bool Network::ProgramChannel::showWindow(QWidget *parent) {
+bool Network::ProgramChannel::showWindow() noexcept {
   if (window == nullptr) {
-    window = new Window::Control::ViewProgram(this, parent);
+    window = new Window::Control::ViewProgram(this, nullptr);
   }
 
-  return AbstractChannel::showWindow(parent);
+  return AbstractChannel::showWindow();
 }
 
 void Network::ProgramChannel::update(

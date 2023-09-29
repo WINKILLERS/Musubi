@@ -23,14 +23,15 @@ signals:
                          std::shared_ptr<Packet::ResponseRemoteScreen> packet);
 
 public slots:
-  bool refresh(uint8_t compression_level = 3);
+  bool setArgs(uint8_t compression_level = 3);
   bool sendMouse(
       const std::vector<Packet::RequestSetMouse::MouseInput> &mouse_inputs);
   bool sendKeyboard(const std::vector<Packet::RequestSetKeyboard::KeyBoardInput>
                         &keyboard_inputs);
   void setInputEnabled(bool is_enable);
+  bool sendSync();
 
-  bool showWindow(QWidget *parent = nullptr) override;
+  bool showWindow() noexcept override;
 
 private slots:
   void update(std::shared_ptr<Packet::Header> header,

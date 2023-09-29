@@ -3,6 +3,7 @@ CXSCREEN
 CYSCREEN
 handshaked
 hwid
+INFOA
 lukka
 Mitsuha
 MSVC
@@ -10,6 +11,7 @@ Musubi
 Pixmap
 qintptr
 qobject
+restinio
 spdlog
 spinbox
 SRCCOPY

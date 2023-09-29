@@ -4,7 +4,6 @@
 #include "qfuture.h"
 #include "stack"
 
-
 namespace Window {
 namespace Control {
 class ViewProgram;
@@ -40,7 +39,7 @@ public slots:
   size_t getProgramCount() const noexcept { return programs.size(); }
   std::optional<std::string> getCurrentUser() const;
 
-  bool showWindow(QWidget *parent = nullptr) override;
+  bool showWindow() noexcept override;
 
 private slots:
   void update(std::shared_ptr<Packet::Header> header,

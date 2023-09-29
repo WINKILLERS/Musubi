@@ -21,9 +21,8 @@ public:
   std::string buildJson() const override final;
   void parseJson(const std::string &buffer) override final;
 
-  inline Type getType() const override final {
-    return Type::request_query_program;
-  }
+  enum { PacketType = (uint32_t)Type::request_query_program };
+  inline Type getType() const override final { return (Type)PacketType; }
 };
 
 struct Program {
