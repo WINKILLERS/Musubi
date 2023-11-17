@@ -9,9 +9,11 @@ public:
   IMPLEMENT_AS_PACKET(client_handshake);
 
   std::string hwid;
+  Role role;
 
   ClientHandshake() = default;
-  ClientHandshake(const std::string &hwid_) : hwid(hwid_){};
+  ClientHandshake(const std::string &hwid_, const Role role_)
+      : hwid(hwid_), role(role_){};
 };
 
 class ServerHandshake : public AbstractPacket {

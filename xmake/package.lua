@@ -23,6 +23,7 @@ add_full_require("nlohmann_json")
 add_full_require("crossguid")
 add_full_require("zstd")
 add_full_require("spdlog")
+add_full_require("magic_enum")
 
 add_dynamic_require("catch2")
 
