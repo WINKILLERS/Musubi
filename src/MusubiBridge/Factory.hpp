@@ -15,6 +15,8 @@ using BodyPtr = std::shared_ptr<AbstractPacket>;
 
 class AbstractGenerator {
 public:
+  virtual ~AbstractGenerator() = default;
+
   virtual std::string buildJson() const = 0;
 };
 
@@ -27,6 +29,7 @@ class Generator : public AbstractGenerator {
 public:
   Generator(T &&packet, const std::string &id = "Default")
       : header((Type)T::PacketType, id), body(packet){};
+  virtual ~Generator() = default;
 
   std::string buildJson() const override;
 
@@ -71,7 +74,7 @@ std::string Generator<T>::buildJson() const {
   return buffer;
 }
 
-class Parser {
+class Parser final {
 public:
   bool parseJson(const std::string &buffer);
   bool parseJson(const std::string &header_data, const std::string &body_data);

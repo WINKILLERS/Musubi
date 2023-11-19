@@ -1,14 +1,18 @@
 #ifndef ABSTRACT_SESSION_HPP
 #define ABSTRACT_SESSION_HPP
+#include "Common.hpp"
 #include "Factory.hpp"
-#include "Handshake.hpp"
 #include <QObject>
 #include <string>
 
 namespace Network {
+// Forward declare
+class AbstractHandler;
+
+// Session type
 enum class Type : uint8_t { tcp };
 
-class PacketNotifier : public QObject {
+class PacketNotifier final : public QObject {
   Q_OBJECT;
 
 public:
@@ -17,12 +21,17 @@ public:
 signals:
 };
 
-class AbstractSession {
+class AbstractSession : public IDeleteSelf {
 public:
+  AbstractSession(AbstractHandler *handler_);
+  virtual ~AbstractSession();
+
   // Get session type
   virtual Type getType() const = 0;
   // Get session role
   inline Bridge::Role getRole() const { return role; };
+  // Get session's description
+  std::string getDescription() const;
 
   // Get remote ip address
   virtual std::string getRemoteAddress() const = 0;
@@ -33,10 +42,12 @@ public:
   virtual void shutdown() = 0;
 
   // Send json packet
-  bool sendJsonPacket(const Bridge::AbstractGenerator &gen);
+  virtual bool sendJsonPacket(const Bridge::AbstractGenerator &gen) = 0;
 
   // Get the hwid for this session
   inline std::string getHwid() const { return hwid; }
+
+  PacketNotifier notifier;
 
 protected:
   // Set the hwid for this session
@@ -51,6 +62,9 @@ private:
 
   // Session's role
   Bridge::Role role = Bridge::Role::unknown;
+
+  // Who created this session
+  AbstractHandler *handler;
 };
 } // namespace Network
 #endif

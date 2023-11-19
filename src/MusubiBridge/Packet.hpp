@@ -32,10 +32,10 @@ enum class Type : uint16_t {
 
 enum class Role : uint8_t { unknown, controller };
 
-#define RESERVED_TYPE(t) (t <= Bridge::Type::header)
-#define CLIENT_TYPE(t)                                                         \
+#define PACKET_RESERVED_TYPE(t) (t <= Bridge::Type::header)
+#define PACKET_CLIENT_TYPE(t)                                                  \
   (Bridge::Type::client_handshake <= t && t < Bridge::Type::server_handshake)
-#define SERVER_TYPE(t) (Bridge::Type::server_handshake <= t)
+#define PACKET_SERVER_TYPE(t) (Bridge::Type::server_handshake <= t)
 
 class AbstractPacket {
 public:
