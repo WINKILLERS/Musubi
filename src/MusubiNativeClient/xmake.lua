@@ -1,16 +1,11 @@
-if is_mode("release") then
-    set_runtimes("MT")
-else
-    set_runtimes("MTd")
-end 
-
 target("MusubiNativeClient")
     set_kind("binary")
+    add_rules("config.static_mode")
     set_languages("c++20")
 
     add_files("MusubiNativeClient.cpp")
     add_files("**/*.cpp")
-    add_headerfiles("**/*.h")
+    add_headerfiles("**/*.hpp")
 
     add_includedirs("$(projectdir)/src/MusubiNativeClient")
 

@@ -10,8 +10,8 @@ rule("config.dynamic_mode")
 rule("config.static_mode")
     before_build(function (target)
         if is_mode("release") then
-            target:set("runtimes", "MD")
+            target:set("runtimes", "MT")
         else
-            target:set("runtimes", "MDd")
+            target:set("runtimes", "MTd")
         end 
     end)

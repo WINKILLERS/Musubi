@@ -10,11 +10,13 @@
 #include <string>
 
 namespace Network {
+class TcpHandler;
+
 class Session : public QObject {
   Q_OBJECT;
 
 public:
-  Session(QAbstractSocket *socket_);
+  Session(TcpHandler *handler_, QAbstractSocket *socket_);
   ~Session();
 
   inline std::string getRemoteAddress() const {
@@ -28,7 +30,9 @@ public:
                        magic_enum::enum_name(role));
   }
 
-  std::string getHwid() const { return hwid; }
+  inline std::string getHwid() const { return hwid; }
+
+  inline Bridge::Role getRole() const { return role; }
 
   void shutdown();
 
@@ -40,10 +44,11 @@ private:
   static const uint32_t max_body_size = 10ul * 1024 * 1024;
   static const uint32_t reverse_padding_size = 100;
 
-  QAbstractSocket *socket;
+  QAbstractSocket *socket = nullptr;
+  TcpHandler *handler = nullptr;
 
-  uint64_t handshake_id;
-  Bridge::Role role;
+  uint64_t handshake_id = 0;
+  Bridge::Role role = Bridge::Role::unknown;
   std::string hwid;
 
   size_t bytes_remain = 0;

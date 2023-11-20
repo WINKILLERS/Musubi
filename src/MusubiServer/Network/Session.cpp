@@ -1,11 +1,13 @@
 #include "Session.hpp"
 #include "Handshake.hpp"
 #include "QtConcurrent/qtconcurrentrun.h"
+#include "TcpHandler.hpp"
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
 namespace Network {
-Session::Session(QAbstractSocket *socket_) : socket(socket_) {
+Session::Session(TcpHandler *handler_, QAbstractSocket *socket_)
+    : handler(handler_), socket(socket_) {
   connect(socket, &QAbstractSocket::disconnected, this, &Session::disconnected);
   connect(socket, &QAbstractSocket::readyRead, this, &Session::appendToBuffer);
 }
@@ -19,7 +21,7 @@ bool Session::processPacket(std::string raw_packet) {
 
   // Parse the request
   Bridge::Parser parser;
-  if (parser.parseJson(buffer) == false) {
+  if (parser.parseJson(raw_packet) == false) {
     spdlog::error("[{}] error while parsing packet", description);
     return false;
   }
@@ -59,13 +61,13 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
-    // // Server internal error
-    // auto migrate = handler->migratePendingSession(this);
-    // if (migrate != true) {
-    //   spdlog::error("[{}] session can not migrate", description);
-    //   shutdown();
-    //   return false;
-    // }
+    // Server internal error
+    auto migrate = handler->migratePendingSession(this);
+    if (migrate != true) {
+      spdlog::error("[{}] session can not migrate", description);
+      shutdown();
+      return false;
+    }
 
     handshake_id = id;
 
@@ -112,8 +114,10 @@ void Session::appendToBuffer() {
 
     // If magic mismatch
     if (magic != Bridge::getBridgeVersion()) {
-      spdlog::error("[{}] invalid packet: magic error, disposing {} bytes",
-                    description, sizeof(uint64_t));
+      spdlog::error("[{}] invalid packet: magic error (require {} but get {}), "
+                    "disposing {} bytes",
+                    Bridge::getBridgeVersion(), magic, description,
+                    sizeof(uint64_t));
 
       // Find new header
       if (socket->bytesAvailable() != 0) {

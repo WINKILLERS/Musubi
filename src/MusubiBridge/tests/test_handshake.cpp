@@ -15,7 +15,7 @@ Bridge::ClientHandshake parseClientHandshake(const std::string &data) {
   return packet;
 }
 
-TEST_CASE("Build handshake packet", "[handshake][packets]") {
+TEST_CASE("Build client handshake packet", "[handshake][packets]") {
   auto data = getClientHandshakeData();
   auto packet = parseClientHandshake(data);
 
@@ -33,7 +33,7 @@ Bridge::ServerHandshake parseServerHandshake(const std::string &data) {
   return packet;
 }
 
-TEST_CASE("Build handshake packet", "[handshake][packets]") {
+TEST_CASE("Build server handshake packet", "[handshake][packets]") {
   auto data = getServerHandshakeData();
   auto packet = parseServerHandshake(data);
 

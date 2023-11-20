@@ -1,5 +1,5 @@
 #include "Window/Logger/Logger.hpp"
-#include "Window/MainWinodw/MainWindow.hpp"
+#include "Window/MainWindow/MainWindow.hpp"
 #include "qobject.h"
 #include <QApplication>
 #include <spdlog/sinks/qt_sinks.h>

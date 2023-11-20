@@ -4,7 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
-constexpr std::string hwid = "test_id";
+constexpr auto hwid = "test_id";
 constexpr auto id = 114514;
 
 std::vector<std::string> getPacketData() {

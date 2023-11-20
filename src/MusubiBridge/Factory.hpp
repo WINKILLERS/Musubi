@@ -5,9 +5,9 @@
 #include <string>
 #include <type_traits>
 
-#define GENERATE_PACKET(t, ...) Bridge::Generator<t>((t(__VA_ARGS__)));
+#define GENERATE_PACKET(t, ...) Bridge::Generator<t>((t(__VA_ARGS__)))
 #define GENERATE_PACKET_WITH_ID(t, id, ...)                                    \
-  Bridge::Generator<t>((t(__VA_ARGS__)), id);
+  Bridge::Generator<t>((t(__VA_ARGS__)), id)
 
 namespace Bridge {
 using HeaderPtr = std::shared_ptr<Header>;

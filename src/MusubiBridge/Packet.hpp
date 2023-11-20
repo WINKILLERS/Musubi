@@ -21,7 +21,7 @@
   void recv##pt(Bridge::HeaderPtr header, std::shared_ptr<Bridge::pt> packet)
 
 namespace Bridge {
-uint32_t getBridgeVersion();
+uint64_t getBridgeVersion();
 
 enum class Type : uint16_t {
   unknown,

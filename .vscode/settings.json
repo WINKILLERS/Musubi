@@ -1,9 +1,11 @@
 {
     "cSpell.words": [
         "hwid",
+        "INFOA",
         "Musubi",
         "qintptr",
         "qobject",
+        "sigc",
         "spdlog"
     ]
 }

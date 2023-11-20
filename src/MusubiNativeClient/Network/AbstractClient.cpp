@@ -1,47 +1,40 @@
-#include "AbstractClient.h"
-#include "AApch.h"
+#include "AbstractClient.hpp"
+#include "Handshake.hpp"
+#include <magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
-Network::AbstractClient::AbstractClient(const std::string &handshake_id)
+namespace Network {
+AbstractClient::AbstractClient(const uint64_t handshake_id)
     : handshake_id(handshake_id) {
   HW_PROFILE_INFOA hw_profile;
-  if (GetCurrentHwProfileA(&hw_profile))
+  if (GetCurrentHwProfileA(&hw_profile)) {
     hwid = hw_profile.szHwProfileGuid;
-
-  spdlog::debug("session ctor, current hwid: {}", fmt::ptr(this), hwid);
-}
-
-Network::AbstractClient::~AbstractClient() {
-  spdlog::info("session {} dtor", fmt::ptr(this));
-}
-
-bool Network::AbstractClient::sendJsonPacket(
-    const Packet::AbstractGenerator &packet) noexcept {
-  return sendJsonPacketInternal(packet);
-}
-
-bool Network::AbstractClient::performHandshake(
-    Packet::Handshake::Role role) noexcept {
-  spdlog::debug("performing handshake with role: {}, id: {}",
-                magic_enum::enum_name(role), handshake_id);
-  auto generator = Packet::Generator<Packet::Handshake>(hwid, role);
-  generator.setId(handshake_id);
-
-  return sendJsonPacket(generator);
-}
-
-void Network::AbstractClient::dispatch(const Packet::Parser &parser) noexcept {
-  spdlog::debug("received packet with type: {}",
-                magic_enum::enum_name(parser.header->type));
-
-  try {
-    invoke(parser.header->type, parser.header, parser.body);
-  } catch (const std::exception &) {
   }
 }
 
-bool Network::AbstractClient::invoke(
-    Packet::Type type, std::shared_ptr<Packet::Header> header,
-    std::shared_ptr<Packet::AbstractPacket> packet) const noexcept {
+AbstractClient::~AbstractClient() {}
+
+bool AbstractClient::performHandshake(Bridge::Role role) {
+  spdlog::debug("performing handshake with role: {}, id: {}",
+                magic_enum::enum_name(role), handshake_id);
+
+  return sendJsonPacket(GENERATE_PACKET_WITH_ID(
+      Bridge::ClientHandshake, handshake_id, hwid, Bridge::Role::controller));
+}
+
+void AbstractClient::dispatch(const Bridge::Parser &parser) {
+  const auto header = parser.getHeader();
+  const auto body = parser.getBody();
+
+  const auto type = header->type;
+
+  spdlog::debug("received packet with type: {}", magic_enum::enum_name(type));
+
+  invoke(type, header, body);
+}
+
+bool AbstractClient::invoke(Bridge::Type type, Bridge::HeaderPtr header,
+                            Bridge::BodyPtr packet) const {
   try {
     auto &signal = callbacks.at(type);
     return signal.emit(header, packet);
@@ -50,3 +43,4 @@ bool Network::AbstractClient::invoke(
     return false;
   }
 }
+} // namespace Network

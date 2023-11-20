@@ -5,7 +5,7 @@
 namespace Bridge {
 constexpr const uint32_t BRIDGE_VERSION = BUILD_MAGIC;
 
-uint32_t getBridgeVersion() { return BRIDGE_VERSION; }
+uint64_t getBridgeVersion() { return BRIDGE_VERSION; }
 
 std::string AbstractPacket::buildJson() const {
   nlohmann::json packet;
