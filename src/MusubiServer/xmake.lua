@@ -14,7 +14,6 @@ target("MusubiServer")
 
     add_packages("spdlog~Dynamic")
     add_packages("magic_enum~Dynamic")
-    add_packages("utfcpp~Dynamic")
     add_packages("jwt-cpp~Dynamic")
     add_packages("nlohmann_json~Dynamic")
     add_packages("fmt~Dynamic")

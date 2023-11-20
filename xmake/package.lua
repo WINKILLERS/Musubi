@@ -23,8 +23,14 @@ add_full_require("nlohmann_json")
 add_full_require("crossguid")
 add_full_require("zstd")
 add_full_require("spdlog")
+add_full_require("jwt-cpp")
+add_full_require("fmt")
 add_full_require("magic_enum")
 
 add_dynamic_require("catch2")
+
+if is_plat("windows") then
+    add_full_require("winreg")
+end
 
 add_dynamic_require("qt6core","qt6gui","qt6network","qt6widgets")

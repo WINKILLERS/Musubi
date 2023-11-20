@@ -1,9 +1,12 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
+#include "Factory.hpp"
+#include "Packet.hpp"
 #include <QAbstractSocket>
 #include <QHostAddress>
 #include <QObject>
 #include <format>
+#include <magic_enum.hpp>
 #include <string>
 
 namespace Network {
@@ -21,7 +24,8 @@ public:
   inline uint32_t getRemotePort() const { return socket->peerPort(); }
 
   inline std::string getDescription() const {
-    return std::format("{}:{}", getRemoteAddress(), getRemotePort());
+    return std::format("{}:{} {}", getRemoteAddress(), getRemotePort(),
+                       magic_enum::enum_name(role));
   }
 
   std::string getHwid() const { return hwid; }
@@ -38,12 +42,15 @@ private:
 
   QAbstractSocket *socket;
 
+  uint64_t handshake_id;
+  Bridge::Role role;
   std::string hwid;
 
   size_t bytes_remain = 0;
   std::string buffer;
 
   bool processPacket(std::string raw_packet);
+  bool dispatchPacket(const Bridge::Parser &parser) const;
 
 private slots:
   void appendToBuffer();
