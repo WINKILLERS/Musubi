@@ -62,7 +62,7 @@ private:
 
   // Migrate pending session to its role
   // TODO: Thread safe
-  bool migratePendingSession(const AbstractSession *session /*View only*/);
+  bool migratePendingSession(AbstractSession *session /*View only*/);
 
   // Connected and initialized clients, own Controller*
   std::unordered_map<std::string /*hwid*/, Controller * /*client*/> clients;

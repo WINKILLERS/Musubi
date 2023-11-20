@@ -5,7 +5,7 @@
 constexpr auto hwid = "test_id";
 
 std::string getClientHandshakeData() {
-  Bridge::ClientHandshake packet(hwid);
+  Bridge::ClientHandshake packet(hwid, Bridge::Role::controller);
   return packet.buildJson();
 }
 

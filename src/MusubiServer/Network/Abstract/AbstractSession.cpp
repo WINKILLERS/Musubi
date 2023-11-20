@@ -47,9 +47,9 @@ bool AbstractSession::processPacket(const std::string &buffer) {
   const auto &header = parser.getHeader();
 
   // Get header fields
-  auto type = header->type;
-  const auto &id = header->id;
-  auto timestamp = header->timestamp;
+  const auto type = header->type;
+  const auto id = header->id;
+  const auto timestamp = header->timestamp;
 
   // Check is client sending server command
   if (PACKET_SERVER_TYPE(type) == true) {
@@ -85,6 +85,8 @@ bool AbstractSession::processPacket(const std::string &buffer) {
       shutdown();
       return false;
     }
+
+    handshake_id = id;
 
     return true;
   }

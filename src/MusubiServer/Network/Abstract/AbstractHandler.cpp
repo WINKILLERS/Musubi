@@ -46,9 +46,10 @@ bool AbstractHandler::addPendingSession(AbstractSession *session) {
 bool AbstractHandler::removeSession(const AbstractSession *session) {
   const auto description = session->getDescription();
 
+  spdlog::info("[{}] disconnected", description);
+
   // If the session is a controller
   if (session->getRole() == Bridge::Role::controller) {
-    spdlog::info("[{}] disconnected", description);
 
     auto controller = getClient(session);
     if (controller == nullptr) {
@@ -96,7 +97,7 @@ bool AbstractHandler::removeSession(const AbstractSession *session) {
   return true;
 }
 
-bool AbstractHandler::migratePendingSession(const AbstractSession *session) {
+bool AbstractHandler::migratePendingSession(AbstractSession *session) {
   const auto description = session->getDescription();
 
   // Basic check

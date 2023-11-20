@@ -4,14 +4,15 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vector>
 
-constexpr auto hwid = "test_id";
-constexpr auto id = "qwq";
+constexpr std::string hwid = "test_id";
+constexpr auto id = 114514;
 
 std::vector<std::string> getPacketData() {
   std::vector<std::string> ret;
 
   {
-    auto gen = GENERATE_PACKET_WITH_ID(Bridge::ClientHandshake, id, hwid);
+    auto gen = GENERATE_PACKET_WITH_ID(Bridge::ClientHandshake, id, hwid,
+                                       Bridge::Role::controller);
     ret.push_back(gen.buildJson());
   }
 

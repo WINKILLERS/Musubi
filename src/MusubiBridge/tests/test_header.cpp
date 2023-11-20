@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 constexpr auto type = Bridge::Type::unknown;
-constexpr auto id = "test_id";
+constexpr auto id = 114514;
 
 std::string getHeaderData() {
   Bridge::Header packet(type, id);

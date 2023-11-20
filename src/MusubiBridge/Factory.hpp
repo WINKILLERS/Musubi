@@ -18,6 +18,12 @@ public:
   virtual ~AbstractGenerator() = default;
 
   virtual std::string buildJson() const = 0;
+  virtual void setId(const uint64_t id) = 0;
+  virtual uint64_t getId() const = 0;
+
+protected:
+  static std::string generate(const std::string &header_data,
+                              const std::string &body_data);
 };
 
 template <typename T>
@@ -27,11 +33,13 @@ template <typename T>
   requires Packet<T>
 class Generator : public AbstractGenerator {
 public:
-  Generator(T &&packet, const std::string &id = "Default")
+  Generator(T &&packet, const uint64_t id = 0)
       : header((Type)T::PacketType, id), body(packet){};
   virtual ~Generator() = default;
 
   std::string buildJson() const override;
+  inline void setId(const uint64_t id) override { header.id = id; };
+  inline uint64_t getId() const override { return header.id; };
 
 private:
   T body;
@@ -41,37 +49,10 @@ private:
 template <typename T>
   requires Packet<T>
 std::string Generator<T>::buildJson() const {
-  std::string buffer;
-
   auto header_data = header.buildJson();
   auto body_data = body.buildJson();
-  uint64_t header_size = header_data.size();
-  uint64_t body_size = body_data.size();
 
-  buffer.resize(2 * sizeof(uint64_t) + header_size + body_size);
-  auto data = buffer.data();
-
-  // Copy header size
-  memcpy(data, &header_size, sizeof(uint64_t));
-  // Increase pointer
-  data += sizeof(uint64_t);
-
-  // Copy body size
-  memcpy(data, &body_size, sizeof(uint64_t));
-  // Increase pointer
-  data += sizeof(uint64_t);
-
-  // Copy header
-  memcpy(data, header_data.data(), header_size);
-  // Increase pointer
-  data += header_size;
-
-  // Copy body
-  memcpy(data, body_data.data(), body_size);
-  // Increase pointer
-  data += body_size;
-
-  return buffer;
+  return generate(header_data, body_data);
 }
 
 class Parser final {

@@ -19,6 +19,7 @@ public:
   bool dispatch(const Bridge::Parser &parser);
 
 signals:
+  void lag(uint32_t lag);
 };
 
 class AbstractSession : public IDeleteSelf {
@@ -47,6 +48,8 @@ public:
   // Get the hwid for this session
   inline std::string getHwid() const { return hwid; }
 
+  inline uint64_t getHandshakeId() const { return handshake_id; }
+
   PacketNotifier notifier;
 
 protected:
@@ -59,6 +62,8 @@ protected:
 private:
   // hwid for the session
   std::string hwid;
+
+  uint64_t handshake_id;
 
   // Session's role
   Bridge::Role role = Bridge::Role::unknown;

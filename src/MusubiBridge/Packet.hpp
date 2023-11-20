@@ -56,19 +56,18 @@ public:
   // Type of body
   Type type;
   // Packet id
-  std::string id;
+  uint64_t id;
   // Auto calculated timestamp
   uint64_t timestamp;
   // Version of bridge
   uint32_t version;
 
   Header()
-      : type(Type::unknown), id("Unknown"), timestamp(0),
-        version(getBridgeVersion()) {
+      : type(Type::unknown), id(0), timestamp(0), version(getBridgeVersion()) {
     initializeTimestamp();
   }
 
-  Header(Type type_, const std::string &id_)
+  Header(Type type_, const uint64_t id_)
       : type(type_), id(id_), version(getBridgeVersion()) {
     initializeTimestamp();
   };
