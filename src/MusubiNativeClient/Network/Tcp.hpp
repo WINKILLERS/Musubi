@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TCP_HPP
+#define TCP_HPP
 #include "AbstractClient.hpp"
 
 namespace Network {
@@ -26,3 +27,4 @@ private:
   asio::ip::tcp::endpoint endpoint;
 };
 } // namespace Network
+#endif

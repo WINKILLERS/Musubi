@@ -1,3 +1,5 @@
+#ifndef CLIENT_MODEL_HPP
+#define CLIENT_MODEL_HPP
 #include <QAbstractTableModel>
 
 namespace Model {
@@ -8,3 +10,4 @@ public:
 private:
 };
 } // namespace Model
+#endif

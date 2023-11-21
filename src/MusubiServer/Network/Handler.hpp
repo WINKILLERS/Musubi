@@ -1,19 +1,18 @@
-#ifndef TCP_HANDLER_HPP
-#define TCP_HANDLER_HPP
+#ifndef HANDLER_HPP
+#define HANDLER_HPP
 #include "Session.hpp"
-#include "qtmetamacros.h"
 #include <QTcpServer>
 
 namespace Network {
-class TcpHandler : public QTcpServer {
+class Handler : public QTcpServer {
   Q_OBJECT;
   friend Session;
 
 public:
   static const uint32_t default_port = 11451;
 
-  TcpHandler(uint32_t port_ = default_port, QObject *parent = nullptr);
-  ~TcpHandler();
+  Handler(uint32_t port_ = default_port, QObject *parent = nullptr);
+  ~Handler();
 
   inline uint32_t getListeningPort() const { return port; }
 
@@ -47,7 +46,7 @@ private:
   std::vector<Session * /*session*/> pending_queue;
 
 private slots:
-  void handleDisconnect();
+  void handleClientDisconnect();
 };
 } // namespace Network
 #endif

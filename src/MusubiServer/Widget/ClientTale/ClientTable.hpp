@@ -1,3 +1,5 @@
+#ifndef CLIENT_TABLE_HPP
+#define CLIENT_TABLE_HPP
 #include <QTableView>
 
 namespace Widget {
@@ -6,3 +8,4 @@ public:
   explicit ClientTable(QWidget *parent = nullptr);
 };
 } // namespace Widget
+#endif

@@ -1,3 +1,5 @@
+#ifndef LOGGER_HPP
+#define LOGGER_HPP
 #include <QTextEdit>
 
 namespace Window {
@@ -8,3 +10,4 @@ public:
 private:
 };
 } // namespace Window
+#endif

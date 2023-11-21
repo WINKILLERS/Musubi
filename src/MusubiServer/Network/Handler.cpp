@@ -1,12 +1,12 @@
-#include "TcpHandler.hpp"
+#include "Handler.hpp"
 #include <QTcpSocket>
 #include <spdlog/spdlog.h>
 
 namespace Network {
-TcpHandler::TcpHandler(uint32_t port_, QObject *parent)
+Handler::Handler(uint32_t port_, QObject *parent)
     : port(port_), QTcpServer(parent) {}
 
-TcpHandler::~TcpHandler() {
+Handler::~Handler() {
   for (auto &session : pending_queue) {
     session->shutdown();
     session->deleteLater();
@@ -15,15 +15,15 @@ TcpHandler::~TcpHandler() {
   pending_queue.clear();
 }
 
-void TcpHandler::pause() { pauseAccepting(); }
+void Handler::pause() { pauseAccepting(); }
 
-void TcpHandler::resume() { resumeAccepting(); }
+void Handler::resume() { resumeAccepting(); }
 
-void TcpHandler::shutdown() { close(); }
+void Handler::shutdown() { close(); }
 
-bool TcpHandler::run() { return QTcpServer::listen(QHostAddress::Any, port); };
+bool Handler::run() { return QTcpServer::listen(QHostAddress::Any, port); };
 
-void TcpHandler::incomingConnection(qintptr socket_descriptor) {
+void Handler::incomingConnection(qintptr socket_descriptor) {
   auto socket = new QTcpSocket;
 
   if (socket->setSocketDescriptor(socket_descriptor) == false) {
@@ -35,10 +35,11 @@ void TcpHandler::incomingConnection(qintptr socket_descriptor) {
 
   pending_queue.emplace_back(session);
 
-  connect(session, &Session::disconnected, this, &TcpHandler::handleDisconnect);
+  connect(session, &Session::disconnected, this,
+          &Handler::handleClientDisconnect);
 }
 
-Session *TcpHandler::getClient(const std::string &hwid) const {
+Session *Handler::getClient(const std::string &hwid) const {
   try {
     return clients.at(hwid);
   } catch (const std::exception &) {
@@ -47,7 +48,7 @@ Session *TcpHandler::getClient(const std::string &hwid) const {
   }
 }
 
-bool TcpHandler::migratePendingSession(Session *session) {
+bool Handler::migratePendingSession(Session *session) {
   auto description = session->getDescription();
 
   // Basic check
@@ -73,7 +74,6 @@ bool TcpHandler::migratePendingSession(Session *session) {
 
   // If role is controller
   if (session->getRole() == Bridge::Role::controller) {
-
     // Add the session to controller
     clients[session->getHwid()] = session;
 
@@ -85,14 +85,25 @@ bool TcpHandler::migratePendingSession(Session *session) {
     // Get the hwid for the session and get controller
     auto controller = getClient(session->getHwid());
   }
-  // TODO
+
   return true;
 }
 
-void TcpHandler::handleDisconnect() {
+void Handler::handleClientDisconnect() {
   auto session = qobject_cast<Session *>(sender());
-  auto iter = std::find(pending_queue.begin(), pending_queue.end(), session);
+  auto description = session->getDescription();
 
-  pending_queue.erase(iter);
+  spdlog::info("[{}] disconnected", description);
+
+  if (session->getRole() == Bridge::Role::controller) {
+    clients.erase(session->getHwid());
+
+    session->deleteLater();
+  } else if (session->getRole() == Bridge::Role::unknown) {
+    auto iter = std::find(pending_queue.begin(), pending_queue.end(), session);
+    pending_queue.erase(iter);
+
+    session->deleteLater();
+  }
 }
 } // namespace Network

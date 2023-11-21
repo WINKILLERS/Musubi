@@ -1,4 +1,6 @@
-#include "Network/TcpHandler.hpp"
+#ifndef MAIN_WINDOW_HPP
+#define MAIN_WINDOW_HPP
+#include "Network/Handler.hpp"
 #include "Widget/ClientTale/ClientTable.hpp"
 #include "ui_MainWinodw.h"
 #include <QMainWindow>
@@ -12,6 +14,7 @@ public:
 private:
   Ui::MainWindow *ui;
   Widget::ClientTable *client_table;
-  Network::TcpHandler *handler;
+  Network::Handler *handler;
 };
 } // namespace Window
+#endif

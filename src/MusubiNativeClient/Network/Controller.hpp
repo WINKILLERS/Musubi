@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONTROLLER_HPP
+#define CONTROLLER_HPP
 #include "Packet.hpp"
 #include "Tcp.hpp"
 
@@ -24,5 +25,9 @@ private:
 
   asio::io_context &io_context;
   asio::ip::tcp::endpoint endpoint;
+
+private:
+  DECLARE_CALLBACK(ServerHandshake);
 };
 } // namespace Network
+#endif

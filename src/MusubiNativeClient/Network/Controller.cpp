@@ -1,9 +1,14 @@
 #include "Controller.hpp"
+#include "Handshake.hpp"
+#include "Util/Util.hpp"
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
-void Network::Controller::run() {
+namespace Network {
+void Controller::run() {
   performHandshake(Bridge::Role::controller);
+
+  REGISTER_CALLBACK(ServerHandshake, Controller);
 
   while (true) {
     auto parser = readJsonPacket();
@@ -16,7 +21,7 @@ void Network::Controller::run() {
   }
 }
 
-bool Network::Controller::checkSubChannelExist(Bridge::Role role) {
+bool Controller::checkSubChannelExist(Bridge::Role role) {
   try {
     auto previous = sub_channels.at(role);
     return true;
@@ -26,8 +31,7 @@ bool Network::Controller::checkSubChannelExist(Bridge::Role role) {
   return false;
 }
 
-bool Network::Controller::createSubChannel(Bridge::Role role,
-                                           const std::string &id) {
+bool Controller::createSubChannel(Bridge::Role role, const std::string &id) {
   if (checkSubChannelExist(role) == true) {
     return false;
   }
@@ -51,7 +55,7 @@ bool Network::Controller::createSubChannel(Bridge::Role role,
   return true;
 }
 
-Network::Controller::~Controller() {
+Controller::~Controller() {
   for (auto &channel_pool : sub_channels) {
     auto thread = std::get<0>(channel_pool.second);
     auto channel = std::get<1>(channel_pool.second);
@@ -66,3 +70,13 @@ Network::Controller::~Controller() {
     delete thread;
   }
 }
+
+bool Controller::onServerHandshake(const Bridge::Parser &parser) {
+  GET_BODY(ServerHandshake);
+
+  spdlog::info("connected, message: {}", body->message);
+
+  return sendJsonPacket(
+      GENERATE_PACKET(Bridge::ClientInformation, Util::getClientInformation()));
+}
+} // namespace Network

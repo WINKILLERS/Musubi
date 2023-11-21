@@ -6,28 +6,24 @@
 #define EMPLACE_PARAM(p) packet[#p] = p
 #define EXTRACT_PARAM(p) p = packet[#p]
 #define IMPLEMENT_AS_PACKET(t)                                                 \
-  enum { PacketType = (uint16_t)Type::t };                                     \
+  enum { PacketType = (uint32_t)Type::t };                                     \
   inline Type getType() const override { return (Type)PacketType; };           \
   std::string buildJson() const override;                                      \
   void parseJson(const std::string &json) override;
 #define IMPLEMENT_AS_PACKET_DEFAULT(t)                                         \
-  enum { PacketType = (uint16_t)Type::t };                                     \
+  enum { PacketType = (uint32_t)Type::t };                                     \
   inline Type getType() const override { return (Type)PacketType; };
-#define CASE_AND_EMIT(pt)                                                      \
-  case (Bridge::Type)Bridge::pt::PacketType:                                   \
-    emit recv##pt(parser.getHeader(), parser.getBody<Bridge::pt>());           \
-    break
-#define DECLARE_SIGNAL(pt)                                                     \
-  void recv##pt(Bridge::HeaderPtr header, std::shared_ptr<Bridge::pt> packet)
 
 namespace Bridge {
 uint64_t getBridgeVersion();
 
-enum class Type : uint16_t {
+enum class Type : uint32_t {
   unknown,
   header = 64,
   client_handshake,
+  client_information,
   server_handshake = 1024,
+  max_type
 };
 
 enum class Role : uint8_t { unknown, controller };

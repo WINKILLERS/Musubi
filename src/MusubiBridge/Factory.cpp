@@ -2,20 +2,51 @@
 #include "Handshake.hpp"
 #include <exception>
 #include <memory>
+#include <zstd.h>
 
 #define CASE_AND_PARSE(pt)                                                     \
   case (Type)pt::PacketType:                                                   \
     body = std::make_shared<pt>();                                             \
-    break;
+    break
 
 namespace Bridge {
+std::string compress(const std::string &data, const uint8_t level) {
+  auto raw_size = data.size();
+  std::string buffer;
+  auto max_compress_size = ZSTD_compressBound(raw_size);
+
+  buffer.resize(max_compress_size);
+
+  auto actual_compress_size = ZSTD_compress(buffer.data(), max_compress_size,
+                                            data.data(), raw_size, level);
+
+  buffer.resize(actual_compress_size);
+
+  return buffer;
+}
+
+std::string decompress(const std::string &data) {
+  auto max_decompress_size = ZSTD_getFrameContentSize(data.data(), data.size());
+  std::string buffer;
+
+  buffer.resize(max_decompress_size);
+
+  auto raw_size = ZSTD_decompress(buffer.data(), max_decompress_size,
+                                  data.data(), data.size());
+
+  buffer.resize(raw_size);
+
+  return buffer;
+}
+
 std::string AbstractGenerator::generate(const std::string &header_data,
                                         const std::string &body_data) {
   std::string buffer;
   uint64_t header_size = header_data.size();
   uint64_t body_size = body_data.size();
+  uint64_t raw_size = 2 * sizeof(uint64_t) + header_size + body_size;
 
-  buffer.resize(2 * sizeof(uint64_t) + header_size + body_size);
+  buffer.resize(raw_size);
   auto data = buffer.data();
 
   // Copy header size
@@ -76,8 +107,9 @@ bool Parser::parseJson(const std::string &header_data,
   }
 
   switch (header->type) {
-    CASE_AND_PARSE(ClientHandshake)
-    CASE_AND_PARSE(ServerHandshake)
+    CASE_AND_PARSE(ClientHandshake);
+    CASE_AND_PARSE(ServerHandshake);
+    CASE_AND_PARSE(ClientInformation);
   case Type::header:
   case Type::unknown:
   default:

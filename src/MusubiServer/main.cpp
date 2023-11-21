@@ -1,6 +1,5 @@
 #include "Window/Logger/Logger.hpp"
 #include "Window/MainWindow/MainWindow.hpp"
-#include "qobject.h"
 #include <QApplication>
 #include <spdlog/sinks/qt_sinks.h>
 #include <spdlog/spdlog.h>
@@ -20,6 +19,8 @@ int main(int argc, char *argv[]) {
   // Set as default logger
   spdlog::set_default_logger(std::make_shared<spdlog::logger>(
       "Musubi", spdlog::sinks_init_list{qt_logger}));
+
+  spdlog::set_level(spdlog::level::level_enum::trace);
 
   // Auto scroll log
   QObject::connect(logger_window, &QTextEdit::textChanged, [logger_window]() {

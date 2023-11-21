@@ -38,6 +38,10 @@ bool Network::TcpClient::sendJsonPacket(
     auto magic = Bridge::getBridgeVersion();
     auto buffer = packet.buildJson();
 
+    spdlog::trace("sending packet with type: {}, size: {:.2f} KB",
+                  magic_enum::enum_name(packet.getType()),
+                  (double)buffer.size() / 1024);
+
     asio::write(socket, asio::buffer(&magic, sizeof(magic)),
                 asio::transfer_exactly(sizeof(magic)));
 

@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   asio::ip::tcp::endpoint endpoint;
   asio::ip::tcp::resolver resolver(io_context);
 
-  spdlog::set_level(spdlog::level::level_enum::debug);
+  spdlog::set_level(spdlog::level::level_enum::trace);
 
   while (true) {
     try {

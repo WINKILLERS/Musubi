@@ -4,6 +4,22 @@
 #include <string>
 
 namespace Bridge {
+class ClientInformation : public AbstractPacket {
+public:
+  IMPLEMENT_AS_PACKET(client_information);
+
+  std::string cpu_model;
+  std::string os_name;
+  std::string user_name;
+  std::string computer_name;
+
+  ClientInformation() = default;
+  ClientInformation(const ClientInformation &information)
+      : cpu_model(information.cpu_model), os_name(information.os_name),
+        user_name(information.user_name),
+        computer_name(information.computer_name){};
+};
+
 class ClientHandshake : public AbstractPacket {
 public:
   IMPLEMENT_AS_PACKET(client_handshake);
@@ -18,9 +34,12 @@ public:
 
 class ServerHandshake : public AbstractPacket {
 public:
-  IMPLEMENT_AS_PACKET_DEFAULT(server_handshake);
+  IMPLEMENT_AS_PACKET(server_handshake);
+
+  std::string message;
 
   ServerHandshake() = default;
+  ServerHandshake(const std::string &message_) : message(message_){};
 };
 } // namespace Bridge
 #endif

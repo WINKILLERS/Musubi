@@ -13,6 +13,10 @@ namespace Bridge {
 using HeaderPtr = std::shared_ptr<Header>;
 using BodyPtr = std::shared_ptr<AbstractPacket>;
 
+std::string compress(const std::string &data, const uint8_t level = 3);
+
+std::string decompress(const std::string &data);
+
 class AbstractGenerator {
 public:
   virtual ~AbstractGenerator() = default;
@@ -20,6 +24,7 @@ public:
   virtual std::string buildJson() const = 0;
   virtual void setId(const uint64_t id) = 0;
   virtual uint64_t getId() const = 0;
+  virtual Type getType() const = 0;
 
 protected:
   static std::string generate(const std::string &header_data,
@@ -34,12 +39,13 @@ template <typename T>
 class Generator : public AbstractGenerator {
 public:
   Generator(T &&packet, const uint64_t id = 0)
-      : header((Type)T::PacketType, id), body(packet){};
+      : header((Type)T::PacketType, id), body(packet) {}
   virtual ~Generator() = default;
 
   std::string buildJson() const override;
-  inline void setId(const uint64_t id) override { header.id = id; };
-  inline uint64_t getId() const override { return header.id; };
+  inline void setId(const uint64_t id) override { header.id = id; }
+  inline uint64_t getId() const override { return header.id; }
+  inline Type getType() const override { return header.type; }
 
 private:
   T body;

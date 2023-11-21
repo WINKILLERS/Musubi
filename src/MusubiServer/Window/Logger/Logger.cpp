@@ -6,6 +6,9 @@ Logger::Logger(QWidget *parent) : QTextEdit(parent) {
   setReadOnly(true);
   resize(800, 600);
 
+  // Set always on top
+  setWindowFlag(Qt::WindowStaysOnTopHint);
+
   // Disable close button
   setWindowFlag(Qt::WindowCloseButtonHint, false);
 }

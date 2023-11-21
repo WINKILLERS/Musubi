@@ -1,20 +1,66 @@
 #include "Session.hpp"
-#include "Handshake.hpp"
-#include "QtConcurrent/qtconcurrentrun.h"
-#include "TcpHandler.hpp"
+#include "Handler.hpp"
+#include "magic_enum.hpp"
+#include "qobject.h"
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
 namespace Network {
-Session::Session(TcpHandler *handler_, QAbstractSocket *socket_)
-    : handler(handler_), socket(socket_) {
+Session::Session(Handler *handler_, QAbstractSocket *socket_, Session *parent_)
+    : handler(handler_), socket(socket_), parent(parent_), QObject(parent_) {
+  socket->setSocketOption(QAbstractSocket::KeepAliveOption, 1);
+
   connect(socket, &QAbstractSocket::disconnected, this, &Session::disconnected);
   connect(socket, &QAbstractSocket::readyRead, this, &Session::appendToBuffer);
+
+  connect(this, &Session::recvClientInformation, this,
+          &Session::onClientInformation);
 }
 
-Session::~Session() { socket->deleteLater(); }
+Session::~Session() {
+  socket->deleteLater();
+
+  for (auto &sub_channel : sub_channels) {
+    sub_channel->shutdown();
+    // Qt will delete sub_channel for us
+  }
+
+  sub_channels.clear();
+}
 
 void Session::shutdown() { socket->disconnectFromHost(); }
+
+bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
+  const auto description = getDescription();
+  auto magic = Bridge::getBridgeVersion();
+  auto buffer = packet.buildJson();
+
+  spdlog::trace("[{}] sending packet with type: {}, size: {:.2f} KB",
+                description, magic_enum::enum_name(packet.getType()),
+                (double)buffer.size() / 1024);
+
+  // Send magic
+  auto ret = socket->write((char *)&magic, sizeof(magic));
+  if (ret == false) {
+    return false;
+  }
+
+  // Send the data, if error occurred, writeData returns -1
+  ret = socket->write(buffer.data(), buffer.size()) != -1;
+
+  if (ret == false) {
+    return false;
+  }
+
+  return socket->flush();
+}
+
+void Session::addSubChannel(Session *sub_channel) {
+  sub_channels.emplace_back(sub_channel);
+
+  connect(sub_channel, &Session::disconnected, this,
+          &Session::handleSubChannelDisconnect);
+}
 
 bool Session::processPacket(std::string raw_packet) {
   const auto description = getDescription();
@@ -35,7 +81,7 @@ bool Session::processPacket(std::string raw_packet) {
   const auto timestamp = header->timestamp;
 
   // Check is client sending server command
-  if (PACKET_SERVER_TYPE(type) == true) {
+  if (PACKET_CLIENT_TYPE(type) == false) {
     spdlog::error("[{}] session sended server command", description);
     shutdown();
     return false;
@@ -61,10 +107,18 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
-    // Server internal error
     auto migrate = handler->migratePendingSession(this);
+    // Server internal error
     if (migrate != true) {
       spdlog::error("[{}] session can not migrate", description);
+      shutdown();
+      return false;
+    }
+
+    auto send = sendJsonPacket(
+        GENERATE_PACKET(Bridge::ServerHandshake, "Official Musubi Server"));
+    if (send != true) {
+      spdlog::error("[{}] session can not reply", description);
       shutdown();
       return false;
     }
@@ -75,7 +129,7 @@ bool Session::processPacket(std::string raw_packet) {
   }
 
   // If we have not performed handshake
-  if (role != Bridge::Role::unknown) {
+  if (role == Bridge::Role::unknown) {
     spdlog::error("[{}] session sending request before initialization",
                   description);
     shutdown();
@@ -94,6 +148,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
 
   // Dispatch it
   switch (type) {
+    CASE_AND_EMIT(ClientInformation);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;
@@ -185,5 +240,29 @@ void Session::appendToBuffer() {
   if (socket->bytesAvailable() >= 3 * sizeof(uint64_t)) {
     appendToBuffer();
   }
+}
+
+void Session::onClientInformation(
+    Bridge::HeaderPtr header,
+    std::shared_ptr<Bridge::ClientInformation> packet) {
+  const auto description = getDescription();
+  information = *packet;
+
+  spdlog::debug(
+      "[{}] received information, cpu: {}, os: {}, user: {}, computer:{}",
+      description, information->cpu_model, information->os_name,
+      information->user_name, information->computer_name);
+}
+
+void Session::handleSubChannelDisconnect() {
+  auto sub_channel = qobject_cast<Session *>(sender());
+  auto description = sub_channel->getDescription();
+
+  spdlog::info("[{}] disconnected", description);
+
+  auto iter = std::find(sub_channels.begin(), sub_channels.end(), sub_channel);
+  sub_channels.erase(iter);
+
+  sub_channel->deleteLater();
 }
 } // namespace Network

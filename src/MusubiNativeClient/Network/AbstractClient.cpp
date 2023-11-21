@@ -24,22 +24,19 @@ bool AbstractClient::performHandshake(Bridge::Role role) {
 
 void AbstractClient::dispatch(const Bridge::Parser &parser) {
   const auto header = parser.getHeader();
-  const auto body = parser.getBody();
 
   const auto type = header->type;
 
-  spdlog::debug("received packet with type: {}", magic_enum::enum_name(type));
-
-  invoke(type, header, body);
+  invoke(type, parser);
 }
 
-bool AbstractClient::invoke(Bridge::Type type, Bridge::HeaderPtr header,
-                            Bridge::BodyPtr packet) const {
+bool AbstractClient::invoke(Bridge::Type type,
+                            const Bridge::Parser &parser) const {
   try {
     auto &signal = callbacks.at(type);
-    return signal.emit(header, packet);
+    return signal.emit(parser);
   } catch (const std::exception &) {
-    assert(false);
+    spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;
   }
 }

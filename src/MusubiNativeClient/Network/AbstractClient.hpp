@@ -1,8 +1,16 @@
-#pragma once
+#ifndef ABSTRACT_CLIENT_HPP
+#define ABSTRACT_CLIENT_HPP
 #include "Factory.hpp"
 #include <asio.hpp>
+#include <cassert>
 #include <sigc++/sigc++.h>
 #include <string>
+
+#define REGISTER_CALLBACK(t, c)                                                \
+  registerCallback((Bridge::Type)Bridge::t::PacketType, *this, &c::on##t);
+
+#define DECLARE_CALLBACK(t) bool on##t(const Bridge::Parser &parser);
+#define GET_BODY(t) const auto body = parser.getBody<Bridge::t>();
 
 namespace Network {
 class AbstractClient {
@@ -36,16 +44,14 @@ protected:
 
   template <typename T_return, typename T_obj, typename T_obj2,
             typename... T_arg>
-  inline decltype(auto) registerCallback(Bridge::Type type, T_obj &obj,
+  inline decltype(auto) registerCallback(const Bridge::Type type, T_obj &obj,
                                          T_return (T_obj2::*func)(T_arg...));
 
 private:
   // Invoke call back
-  bool invoke(Bridge::Type type, Bridge::HeaderPtr header,
-              Bridge::BodyPtr packet) const;
+  bool invoke(Bridge::Type type, const Bridge::Parser &parser) const;
 
-  std::unordered_map<Bridge::Type,
-                     sigc::signal<bool(Bridge::HeaderPtr, Bridge::BodyPtr)>>
+  std::unordered_map<Bridge::Type, sigc::signal<bool(const Bridge::Parser &)>>
       callbacks;
 
   // The hwid of the client
@@ -56,9 +62,12 @@ private:
 
 template <typename T_return, typename T_obj, typename T_obj2, typename... T_arg>
 inline decltype(auto)
-AbstractClient::registerCallback(Bridge::Type type, T_obj &obj,
+AbstractClient::registerCallback(const Bridge::Type type, T_obj &obj,
                                  T_return (T_obj2::*func)(T_arg...)) {
+  assert(PACKET_SERVER_TYPE(type) == true);
+
   auto &signal = callbacks[type];
   return signal.connect(sigc::mem_fun(obj, func));
 }
 } // namespace Network
+#endif
