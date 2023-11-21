@@ -1,5 +1,6 @@
 #include "Factory.hpp"
 #include "Handshake.hpp"
+#include "Heartbeat.hpp"
 #include <exception>
 #include <memory>
 #include <zstd.h>
@@ -110,6 +111,7 @@ bool Parser::parseJson(const std::string &header_data,
     CASE_AND_PARSE(ClientHandshake);
     CASE_AND_PARSE(ServerHandshake);
     CASE_AND_PARSE(ClientInformation);
+    CASE_AND_PARSE(Heartbeat);
   case Type::header:
   case Type::unknown:
   default:

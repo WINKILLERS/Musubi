@@ -1,5 +1,6 @@
 #include "Controller.hpp"
 #include "Handshake.hpp"
+#include "HeartbeatChannel.hpp"
 #include "Util/Util.hpp"
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
@@ -31,14 +32,15 @@ bool Controller::checkSubChannelExist(Bridge::Role role) {
   return false;
 }
 
-bool Controller::createSubChannel(Bridge::Role role, const std::string &id) {
+bool Controller::createSubChannel(const Bridge::Role role, const uint64_t id) {
   if (checkSubChannelExist(role) == true) {
     return false;
   }
 
   AbstractClient *client = nullptr;
 
-  if (false) {
+  if (role == Bridge::Role::heartbeat) {
+    client = new HeartbeatChannel(io_context, getEndpoint(), id);
   } else {
     spdlog::error("role not unhandled, role: {}", magic_enum::enum_name(role));
     assert(false);
@@ -76,7 +78,14 @@ bool Controller::onServerHandshake(const Bridge::Parser &parser) {
 
   spdlog::info("connected, message: {}", body->message);
 
-  return sendJsonPacket(
+  auto ret = sendJsonPacket(
       GENERATE_PACKET(Bridge::ClientInformation, Util::getClientInformation()));
+
+  if (ret != true) {
+    spdlog::error("can not reply server handshake");
+    return false;
+  }
+
+  return createSubChannel(Bridge::Role::heartbeat, 0);
 }
 } // namespace Network

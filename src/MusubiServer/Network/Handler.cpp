@@ -84,6 +84,8 @@ bool Handler::migratePendingSession(Session *session) {
   else {
     // Get the hwid for the session and get controller
     auto controller = getClient(session->getHwid());
+
+    controller->addSubChannel(session);
   }
 
   return true;

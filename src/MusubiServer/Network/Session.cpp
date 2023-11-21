@@ -1,7 +1,6 @@
 #include "Session.hpp"
 #include "Handler.hpp"
 #include "magic_enum.hpp"
-#include "qobject.h"
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
@@ -149,6 +148,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
   // Dispatch it
   switch (type) {
     CASE_AND_EMIT(ClientInformation);
+    CASE_AND_EMIT(Heartbeat);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;

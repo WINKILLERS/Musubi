@@ -21,17 +21,19 @@ enum class Type : uint32_t {
   unknown,
   header = 64,
   client_handshake,
+  heartbeat,
   client_information,
   server_handshake = 1024,
   max_type
 };
 
-enum class Role : uint8_t { unknown, controller };
+enum class Role : uint8_t { unknown, controller, heartbeat };
 
 #define PACKET_RESERVED_TYPE(t) (t <= Bridge::Type::header)
 #define PACKET_CLIENT_TYPE(t)                                                  \
   (Bridge::Type::client_handshake <= t && t < Bridge::Type::server_handshake)
-#define PACKET_SERVER_TYPE(t) (Bridge::Type::server_handshake <= t)
+#define PACKET_SERVER_TYPE(t)                                                  \
+  (Bridge::Type::server_handshake <= t && t < Bridge::Type::max_type)
 
 class AbstractPacket {
 public:

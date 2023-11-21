@@ -18,8 +18,8 @@ bool AbstractClient::performHandshake(Bridge::Role role) {
   spdlog::debug("performing handshake with role: {}, id: {}",
                 magic_enum::enum_name(role), handshake_id);
 
-  return sendJsonPacket(GENERATE_PACKET_WITH_ID(
-      Bridge::ClientHandshake, handshake_id, hwid, Bridge::Role::controller));
+  return sendJsonPacket(GENERATE_PACKET_WITH_ID(Bridge::ClientHandshake,
+                                                handshake_id, hwid, role));
 }
 
 void AbstractClient::dispatch(const Bridge::Parser &parser) {

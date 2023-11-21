@@ -9,22 +9,20 @@ public:
   // Make sure io_context always valid
   Controller(asio::io_context &io_context,
              const asio::ip::tcp::endpoint &endpoint)
-      : TcpClient(io_context, endpoint, 0), io_context(io_context),
-        endpoint(endpoint) {}
-  virtual ~Controller();
+      : TcpClient(io_context, endpoint, 0), io_context(io_context) {}
+  ~Controller();
 
   // AbstractClient implementation
   virtual void run() override;
 
 private:
   bool checkSubChannelExist(Bridge::Role role);
-  bool createSubChannel(Bridge::Role role, const std::string &id);
+  bool createSubChannel(const Bridge::Role role, const uint64_t id);
 
   std::unordered_map<Bridge::Role, std::tuple<std::thread *, AbstractClient *>>
       sub_channels;
 
   asio::io_context &io_context;
-  asio::ip::tcp::endpoint endpoint;
 
 private:
   DECLARE_CALLBACK(ServerHandshake);

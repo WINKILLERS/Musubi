@@ -2,6 +2,7 @@
 #define SESSION_HPP
 #include "Factory.hpp"
 #include "Handshake.hpp"
+#include "Heartbeat.hpp"
 #include "Packet.hpp"
 #include <QAbstractSocket>
 #include <QHostAddress>
@@ -59,6 +60,7 @@ signals:
   void disconnected();
 
   DECLARE_SIGNAL(ClientInformation);
+  DECLARE_SIGNAL(Heartbeat);
 
 private:
   // Called from handler when a sub channel connected

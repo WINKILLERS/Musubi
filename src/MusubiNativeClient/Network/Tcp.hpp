@@ -8,11 +8,19 @@ public:
   TcpClient(asio::io_context &io_context,
             const asio::ip::tcp::endpoint &endpoint,
             const uint64_t handshake_id);
-  virtual ~TcpClient();
+  ~TcpClient();
 
   // AbstractClient implementation
   virtual bool connect() override;
   virtual void shutdown() override;
+
+  inline std::string getRemoteAddress() const {
+    return endpoint.address().to_string();
+  }
+
+  inline uint16_t getRemotePort() const { return endpoint.port(); }
+
+  inline asio::ip::tcp::endpoint getEndpoint() const { return endpoint; }
 
 protected:
   // AbstractClient implementation
