@@ -15,6 +15,8 @@ public:
   // AbstractClient implementation
   virtual void run() override;
 
+  inline bool isShutdownByServer() const { return shutdown_by_server; }
+
 private:
   bool checkSubChannelExist(Bridge::Role role);
   bool createSubChannel(const Bridge::Role role, const uint64_t id);
@@ -23,6 +25,8 @@ private:
       sub_channels;
 
   asio::io_context &io_context;
+
+  bool shutdown_by_server = false;
 
 private:
   DECLARE_CALLBACK(ServerHandshake);

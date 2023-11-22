@@ -37,9 +37,11 @@ public:
   IMPLEMENT_AS_PACKET(server_handshake);
 
   std::string message;
+  bool shutdown;
 
   ServerHandshake() = default;
-  ServerHandshake(const std::string &message_) : message(message_){};
+  ServerHandshake(const std::string &message_, bool shutdown_)
+      : message(message_), shutdown(shutdown_){};
 };
 } // namespace Bridge
 #endif

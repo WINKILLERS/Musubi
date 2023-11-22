@@ -1,4 +1,5 @@
 #include "MainWindow.hpp"
+#include "qnamespace.h"
 
 namespace Window {
 MainWindow::MainWindow() : ui(new Ui::MainWindow()), QMainWindow(nullptr) {
@@ -11,8 +12,11 @@ MainWindow::MainWindow() : ui(new Ui::MainWindow()), QMainWindow(nullptr) {
   client_table = new Widget::ClientTable(ui->client_table);
   ui->client_table_layout->addWidget(client_table);
 
-  auto handler = new Network::Handler(Network::Handler::default_port, this);
+  handler = new Network::Handler(Network::Handler::default_port, this);
   handler->run();
+
+  client_model = new Model::ClientModel(handler, this);
+  client_table->setModel(client_model);
 }
 
 MainWindow::~MainWindow() { delete ui; }

@@ -28,8 +28,8 @@ public:
   Session *getClient(const std::string &hwid) const;
 
 signals:
-  void clientConnected(Session *session);
-  void clientDisconnected(Session *session);
+  void clientConnected(Session *client);
+  void clientDisconnected(Session *client);
 
 protected:
   void incomingConnection(qintptr socket_descriptor) override;

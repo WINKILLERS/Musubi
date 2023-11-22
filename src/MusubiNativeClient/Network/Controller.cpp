@@ -78,6 +78,13 @@ bool Controller::onServerHandshake(const Bridge::Parser &parser) {
 
   spdlog::info("connected, message: {}", body->message);
 
+  if (body->shutdown) {
+    spdlog::info("shutdown by server");
+    shutdown_by_server = true;
+    shutdown();
+    return false;
+  }
+
   auto ret = sendJsonPacket(
       GENERATE_PACKET(Bridge::ClientInformation, Util::getClientInformation()));
 

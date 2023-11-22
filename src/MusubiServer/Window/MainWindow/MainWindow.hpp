@@ -1,7 +1,8 @@
 #ifndef MAIN_WINDOW_HPP
 #define MAIN_WINDOW_HPP
+#include "Model/ClientModel/ClientModel.hpp"
 #include "Network/Handler.hpp"
-#include "Widget/ClientTale/ClientTable.hpp"
+#include "Widget/ClientTable/ClientTable.hpp"
 #include "ui_MainWinodw.h"
 #include <QMainWindow>
 
@@ -14,6 +15,7 @@ public:
 private:
   Ui::MainWindow *ui;
   Widget::ClientTable *client_table;
+  Model::ClientModel *client_model;
   Network::Handler *handler;
 };
 } // namespace Window

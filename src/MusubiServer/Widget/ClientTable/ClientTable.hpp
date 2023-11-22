@@ -6,6 +6,8 @@ namespace Widget {
 class ClientTable : public QTableView {
 public:
   explicit ClientTable(QWidget *parent = nullptr);
+
+private:
 };
 } // namespace Widget
 #endif

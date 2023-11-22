@@ -52,6 +52,38 @@ public:
 
   inline Bridge::Role getRole() const { return role; }
 
+  inline std::string getComputerName() const {
+    if (information.has_value()) {
+      return information.value().computer_name;
+    } else {
+      return std::string();
+    }
+  }
+
+  inline std::string getUserName() const {
+    if (information.has_value()) {
+      return information.value().user_name;
+    } else {
+      return std::string();
+    }
+  }
+
+  inline std::string getCpuModel() const {
+    if (information.has_value()) {
+      return information.value().cpu_model;
+    } else {
+      return std::string();
+    }
+  }
+
+  inline std::string getOsName() const {
+    if (information.has_value()) {
+      return information.value().os_name;
+    } else {
+      return std::string();
+    }
+  }
+
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
 
   void shutdown();

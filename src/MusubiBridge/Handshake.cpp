@@ -42,6 +42,7 @@ std::string ServerHandshake::buildJson() const {
   nlohmann::json packet;
 
   EMPLACE_PARAM(message);
+  EMPLACE_PARAM(shutdown);
 
   return packet.dump(-1, ' ', true);
 }
@@ -50,5 +51,6 @@ void ServerHandshake::parseJson(const std::string &json) {
   const nlohmann::json packet = nlohmann::json::parse(json);
 
   EXTRACT_PARAM(message);
+  EXTRACT_PARAM(shutdown);
 }
 } // namespace Bridge

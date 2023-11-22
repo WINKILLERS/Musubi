@@ -1,6 +1,8 @@
 #include "Session.hpp"
 #include "Handler.hpp"
 #include "magic_enum.hpp"
+#include "qabstractsocket.h"
+#include "qnamespace.h"
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
@@ -27,7 +29,10 @@ Session::~Session() {
   sub_channels.clear();
 }
 
-void Session::shutdown() { socket->disconnectFromHost(); }
+void Session::shutdown() {
+  QMetaObject::invokeMethod(socket, &QAbstractSocket::disconnectFromHost,
+                            Qt::QueuedConnection);
+}
 
 bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
   const auto description = getDescription();
@@ -110,12 +115,14 @@ bool Session::processPacket(std::string raw_packet) {
     // Server internal error
     if (migrate != true) {
       spdlog::error("[{}] session can not migrate", description);
+      sendJsonPacket(GENERATE_PACKET(Bridge::ServerHandshake,
+                                     "Duplicated connection", true));
       shutdown();
       return false;
     }
 
-    auto send = sendJsonPacket(
-        GENERATE_PACKET(Bridge::ServerHandshake, "Official Musubi Server"));
+    auto send = sendJsonPacket(GENERATE_PACKET(
+        Bridge::ServerHandshake, "Official Musubi Server", false));
     if (send != true) {
       spdlog::error("[{}] session can not reply", description);
       shutdown();
@@ -231,6 +238,7 @@ void Session::appendToBuffer() {
     // Call base to process the packet
     auto task =
         QtConcurrent::run(&Session::processPacket, this, std::move(buffer));
+    // processPacket(buffer);
 
     // Clear the buffer
     buffer.clear();
@@ -257,8 +265,6 @@ void Session::onClientInformation(
 void Session::handleSubChannelDisconnect() {
   auto sub_channel = qobject_cast<Session *>(sender());
   auto description = sub_channel->getDescription();
-
-  spdlog::info("[{}] disconnected", description);
 
   auto iter = std::find(sub_channels.begin(), sub_channels.end(), sub_channel);
   sub_channels.erase(iter);

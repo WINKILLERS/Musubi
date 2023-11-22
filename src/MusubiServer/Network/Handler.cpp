@@ -1,5 +1,6 @@
 #include "Handler.hpp"
 #include <QTcpSocket>
+#include <QThread>
 #include <spdlog/spdlog.h>
 
 namespace Network {
@@ -70,10 +71,14 @@ bool Handler::migratePendingSession(Session *session) {
   // Remove the session from pending queue
   pending_queue.erase(iter);
 
-  spdlog::info("[{}] connected", description);
-
   // If role is controller
   if (session->getRole() == Bridge::Role::controller) {
+    // Check if this is a duplicated connection
+    if (getClient(session->getHwid()) != nullptr) {
+      // Multiple connection, shutdown
+      return false;
+    }
+
     // Add the session to controller
     clients[session->getHwid()] = session;
 
@@ -88,6 +93,8 @@ bool Handler::migratePendingSession(Session *session) {
     controller->addSubChannel(session);
   }
 
+  spdlog::info("[{}] connected", description);
+
   return true;
 }
 
@@ -98,7 +105,11 @@ void Handler::handleClientDisconnect() {
   spdlog::info("[{}] disconnected", description);
 
   if (session->getRole() == Bridge::Role::controller) {
-    clients.erase(session->getHwid());
+    // Check if this is not a duplicated connection
+    if (getClient(session->getHwid()) == session) {
+      clients.erase(session->getHwid());
+      emit clientDisconnected(session);
+    }
 
     session->deleteLater();
   } else if (session->getRole() == Bridge::Role::unknown) {

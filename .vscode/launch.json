@@ -7,10 +7,18 @@
         {
             "type": "xmake",
             "request": "launch",
-            "name": "Debug MusubiBridgeTests",
+            "name": "Run MusubiBridgeTests",
             "target": "MusubiBridgeTests",
             "cwd": "${workspaceFolder}",
-            "stopAtEntry": true
+            "stopAtEntry": false
+        },
+        {
+            "type": "xmake",
+            "request": "launch",
+            "name": "Debug MusubiServer",
+            "target": "MusubiServer",
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false
         }
     ]
 }
