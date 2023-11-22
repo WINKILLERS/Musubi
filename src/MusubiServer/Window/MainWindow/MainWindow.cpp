@@ -1,5 +1,4 @@
 #include "MainWindow.hpp"
-#include "qnamespace.h"
 
 namespace Window {
 MainWindow::MainWindow() : ui(new Ui::MainWindow()), QMainWindow(nullptr) {
