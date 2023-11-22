@@ -102,11 +102,11 @@ void Handler::handleClientDisconnect() {
   auto session = qobject_cast<Session *>(sender());
   auto description = session->getDescription();
 
-  spdlog::info("[{}] disconnected", description);
-
   if (session->getRole() == Bridge::Role::controller) {
     // Check if this is not a duplicated connection
     if (getClient(session->getHwid()) == session) {
+      spdlog::info("[{}] disconnected", description);
+
       clients.erase(session->getHwid());
       emit clientDisconnected(session);
     }

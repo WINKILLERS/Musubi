@@ -1,4 +1,5 @@
 #include "Logger.hpp"
+#include "qthread.h"
 
 namespace Window {
 Logger::Logger(QWidget *parent) : QTextEdit(parent) {
@@ -12,4 +13,6 @@ Logger::Logger(QWidget *parent) : QTextEdit(parent) {
   // Disable close button
   setWindowFlag(Qt::WindowCloseButtonHint, false);
 }
+
+Logger::~Logger() {}
 } // namespace Window

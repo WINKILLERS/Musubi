@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QGroupBox" name="client_table">
       <property name="title">
        <string>Client Table</string>
@@ -26,6 +26,9 @@
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="0" column="0">
+     <layout class="QGridLayout" name="tool_bar_layout"/>
     </item>
    </layout>
   </widget>

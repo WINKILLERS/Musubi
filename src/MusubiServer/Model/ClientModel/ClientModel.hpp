@@ -39,6 +39,8 @@ public:
   QVariant data(const QModelIndex &index,
                 int role = Qt::DisplayRole) const override;
 
+  inline std::string getHwid(int row) const { return hwid_mapping[row]; };
+
 public slots:
   void clientConnected(Network::Session *client);
   void clientDisconnected(Network::Session *client);

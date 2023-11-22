@@ -6,6 +6,7 @@ namespace Window {
 class Logger : public QTextEdit {
 public:
   explicit Logger(QWidget *parent = nullptr);
+  ~Logger();
 
 private:
 };

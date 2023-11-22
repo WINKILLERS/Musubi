@@ -27,3 +27,5 @@ target("MusubiNativeClient")
     add_deps("MusubiBridgeStatic")
 
     add_syslinks("gdi32.lib","Secur32.lib","wbemuuid.lib","OleAut32.lib","Shell32.lib","ntdll.lib","user32.lib","Advapi32.lib")
+    
+    add_defines("_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS")

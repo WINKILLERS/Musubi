@@ -23,7 +23,7 @@ enum class Type : uint32_t {
   client_handshake,
   heartbeat,
   client_information,
-  server_handshake = 1024,
+  server_handshake = 512,
   max_type
 };
 

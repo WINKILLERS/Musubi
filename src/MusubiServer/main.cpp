@@ -1,11 +1,14 @@
 #include "Window/Logger/Logger.hpp"
 #include "Window/MainWindow/MainWindow.hpp"
+#include "qicon.h"
 #include <QApplication>
 #include <spdlog/sinks/qt_sinks.h>
 #include <spdlog/spdlog.h>
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
+
+  app.setWindowIcon(QIcon(":/MusubiServer/MusubiServer.ico"));
 
   // Build logger window
   auto logger_window = new Window::Logger(nullptr);

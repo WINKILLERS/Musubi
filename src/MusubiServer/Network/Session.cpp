@@ -38,9 +38,10 @@ bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
   const auto description = getDescription();
   auto magic = Bridge::getBridgeVersion();
   auto buffer = packet.buildJson();
+  auto type = packet.getType();
 
   spdlog::trace("[{}] sending packet with type: {}, size: {:.2f} KB",
-                description, magic_enum::enum_name(packet.getType()),
+                description, magic_enum::enum_name(type),
                 (double)buffer.size() / 1024);
 
   // Send magic
@@ -83,6 +84,9 @@ bool Session::processPacket(std::string raw_packet) {
   const auto type = header->type;
   const auto id = header->id;
   const auto timestamp = header->timestamp;
+
+  spdlog::trace("[{}] received packet type: {}", description,
+                magic_enum::enum_name(type));
 
   // Check is client sending server command
   if (PACKET_CLIENT_TYPE(type) == false) {
@@ -253,18 +257,14 @@ void Session::appendToBuffer() {
 void Session::onClientInformation(
     Bridge::HeaderPtr header,
     std::shared_ptr<Bridge::ClientInformation> packet) {
-  const auto description = getDescription();
   information = *packet;
-
-  spdlog::debug(
-      "[{}] received information, cpu: {}, os: {}, user: {}, computer:{}",
-      description, information->cpu_model, information->os_name,
-      information->user_name, information->computer_name);
 }
 
 void Session::handleSubChannelDisconnect() {
   auto sub_channel = qobject_cast<Session *>(sender());
   auto description = sub_channel->getDescription();
+
+  spdlog::info("[{}] disconnected", description);
 
   auto iter = std::find(sub_channels.begin(), sub_channels.end(), sub_channel);
   sub_channels.erase(iter);
