@@ -5,7 +5,7 @@
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include "Packet.hpp"
-#include "qwidget.h"
+#include "TerminateProcess.hpp"
 #include <QAbstractSocket>
 #include <QHostAddress>
 #include <QObject>
@@ -84,6 +84,7 @@ signals:
   DECLARE_SIGNAL(ClientInformation);
   DECLARE_SIGNAL(Heartbeat);
   DECLARE_SIGNAL(ResponseGetProcesses);
+  DECLARE_SIGNAL(ResponseTerminateProcess);
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
@@ -91,6 +92,9 @@ public slots:
   void shutdown();
 
   void closeAllWindow();
+
+  bool refreshProcesses();
+  bool terminateProcess(const Bridge::RequestTerminateProcess packet);
 
 private:
   // Called from handler when a sub channel connected

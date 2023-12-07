@@ -79,4 +79,23 @@ std::optional<Bridge::ResponseGetProcesses> getProcesses() {
 
   return packet;
 }
+
+std::optional<Bridge::ResponseTerminateProcess> terminateProcess(
+    const std::shared_ptr<Bridge::RequestTerminateProcess> packet) {
+  const auto &terminating = packet->processes;
+  Bridge::ResponseTerminateProcess response;
+
+  for (const auto &pid : terminating) {
+    auto handle = OpenProcess(PROCESS_TERMINATE, false, pid);
+
+    if (handle != nullptr) {
+      auto success = TerminateProcess(handle, 0);
+      response.addProcess(pid, success);
+    } else {
+      response.addProcess(pid, false);
+    }
+  }
+
+  return response;
+}
 } // namespace Util

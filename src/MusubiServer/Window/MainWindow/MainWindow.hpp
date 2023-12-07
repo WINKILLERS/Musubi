@@ -4,6 +4,7 @@
 #include "Network/Handler.hpp"
 #include "Widget/Actions/ViewAbout/ViewAbout.hpp"
 #include "Widget/Actions/ViewClientInfo/ViewClientInfo.hpp"
+#include "Widget/Actions/ViewProcesses/ViewProcesses.hpp"
 #include "Widget/ClientTable/ClientTable.hpp"
 #include "ui_MainWinodw.h"
 #include <QMainWindow>
@@ -31,6 +32,7 @@ private:
   QToolBar *tool_bar;
   Widget::ViewClientInfo *action_view_info;
   Widget::ViewAbout *action_view_about;
+  Widget::ViewProcesses *action_view_processes;
 };
 } // namespace Window
 #endif

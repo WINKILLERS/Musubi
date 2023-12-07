@@ -9,7 +9,7 @@ class ClientInformation : public QDialog {
   Q_OBJECT;
 
 public:
-  enum class IndexItem : uint8_t {
+  enum IndexItem : uint8_t {
     address = 0,
     computer_name,
     user_name,

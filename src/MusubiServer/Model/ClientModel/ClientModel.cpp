@@ -38,8 +38,7 @@ QVariant ClientModel::data(const QModelIndex &index, int role) const {
   auto row = index.row();
   auto column = (ColumnItem)index.column();
 
-  if (row > hwid_mapping.size() ||
-      index.column() >= (int)ColumnItem::max_item) {
+  if (row > hwid_mapping.size() || index.column() >= ColumnItem::max_item) {
     return QVariant();
   }
 

@@ -44,6 +44,11 @@ MainWindow::MainWindow() : ui(new Ui::MusubiServer()), QMainWindow(nullptr) {
   action_view_info->setText(tr("View Client Info"));
   tool_bar->addAction(action_view_info);
 
+  action_view_processes =
+      new Widget::ViewProcesses(selection, client_model, tool_bar);
+  action_view_processes->setText(tr("View Processes"));
+  tool_bar->addAction(action_view_processes);
+
   action_view_about = new Widget::ViewAbout(this);
   action_view_about->setText(tr("View Musubi About"));
   tool_bar->addAction(action_view_about);

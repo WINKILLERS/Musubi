@@ -1,6 +1,7 @@
 #include "Session.hpp"
 #include "Handler.hpp"
 #include "magic_enum.hpp"
+#include <QWidget>
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
@@ -75,6 +76,15 @@ void Session::closeAllWindow() {
   windows.clear();
 }
 
+bool Session::refreshProcesses() {
+  return sendJsonPacket(GENERATE_PACKET(Bridge::RequestGetProcesses));
+}
+
+bool Session::terminateProcess(const Bridge::RequestTerminateProcess packet) {
+  return sendJsonPacket(
+      GENERATE_PACKET(Bridge::RequestTerminateProcess, packet));
+}
+
 void Session::addSubChannel(Session *sub_channel) {
   sub_channels.emplace_back(sub_channel);
   sub_channel->setParent(this);
@@ -141,12 +151,7 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
-    send = sendJsonPacket(GENERATE_PACKET(Bridge::RequestGetProcesses));
-    if (send != true) {
-      spdlog::error("[{}] session can get processes", description);
-      shutdown();
-      return false;
-    }
+    refreshProcesses();
 
     handshake_id = id;
 
@@ -176,6 +181,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
     CASE_AND_EMIT(ClientInformation);
     CASE_AND_EMIT(Heartbeat);
     CASE_AND_EMIT(ResponseGetProcesses);
+    CASE_AND_EMIT(ResponseTerminateProcess);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;
@@ -279,6 +285,21 @@ void Session::onClientInformation(
 void Session::onResponseGetProcesses(
     Bridge::HeaderPtr header,
     std::shared_ptr<Bridge::ResponseGetProcesses> packet) {
+  auto &unsorted = packet->processes;
+
+  std::sort(unsorted.begin(), unsorted.end(),
+            [](const Bridge::Process &p1, const Bridge::Process &p2) {
+              auto lower_p1 = p1.name;
+              auto lower_p2 = p2.name;
+              auto tolower = [](auto c) { return std::tolower(c); };
+              std::transform(lower_p1.begin(), lower_p1.end(), lower_p1.begin(),
+                             tolower);
+              std::transform(lower_p2.begin(), lower_p2.end(), lower_p2.begin(),
+                             tolower);
+
+              return lower_p1 < lower_p2;
+            });
+
   processes = *packet;
 }
 

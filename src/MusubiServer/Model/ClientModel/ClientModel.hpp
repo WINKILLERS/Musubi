@@ -15,7 +15,7 @@ class ClientModel : public QAbstractTableModel {
   Q_OBJECT;
 
 public:
-  enum class ColumnItem : uint8_t {
+  enum ColumnItem : uint8_t {
     location = 0,
     address,
     computer_name,

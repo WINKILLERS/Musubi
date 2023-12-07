@@ -2,7 +2,9 @@
 #define UTIL_HPP
 #include "GetProcesses.hpp"
 #include "Handshake.hpp"
+#include "TerminateProcess.hpp"
 #include <Windows.h>
+#include <memory>
 #include <optional>
 
 namespace Util {
@@ -12,5 +14,7 @@ std::string utf8to8(const std::u8string &u8str);
 
 Bridge::ClientInformation getInformation();
 std::optional<Bridge::ResponseGetProcesses> getProcesses();
+std::optional<Bridge::ResponseTerminateProcess>
+terminateProcess(const std::shared_ptr<Bridge::RequestTerminateProcess> packet);
 } // namespace Util
 #endif

@@ -6,14 +6,14 @@ ClientInformation::ClientInformation(Network::Session *session_,
     : ui(new Ui::ClientInformation()), QDialog(parent), session(session_) {
   ui->setupUi(this);
 
-  ui->table->setRowCount((int)IndexItem::max_item);
+  ui->table->setRowCount(IndexItem::max_item);
   ui->table->setColumnCount(1);
-
   ui->table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
   for (const auto &index : magic_enum::enum_values<IndexItem>()) {
-    ui->table->setVerticalHeaderItem((int)index,
+    ui->table->setVerticalHeaderItem(index,
                                      new QTableWidgetItem(getIndexText(index)));
-    ui->table->setItem((int)index, 0, new QTableWidgetItem(getData(index)));
+    ui->table->setItem(index, 0, new QTableWidgetItem(getData(index)));
   }
 
   ui->table->setHorizontalHeaderItem(0, new QTableWidgetItem(tr("Value")));

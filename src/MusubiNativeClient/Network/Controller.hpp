@@ -31,6 +31,7 @@ private:
 private:
   DECLARE_CALLBACK(ServerHandshake);
   DECLARE_CALLBACK(RequestGetProcesses);
+  DECLARE_CALLBACK(RequestTerminateProcess);
 };
 } // namespace Network
 #endif
