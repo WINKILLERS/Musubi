@@ -33,8 +33,6 @@ protected:
   void incomingConnection(qintptr socket_descriptor) override;
 
 private:
-  bool migratePendingSession(Session *session);
-
   uint32_t port;
 
   // Connected and initialized clients
@@ -44,7 +42,9 @@ private:
   std::vector<Session * /*session*/> pending_queue;
 
 private slots:
-  void handleClientDisconnect();
+  void handleSessionDisconnect();
+
+  bool migratePendingSession();
 };
 } // namespace Network
 #endif

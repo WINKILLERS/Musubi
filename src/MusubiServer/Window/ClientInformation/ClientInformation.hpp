@@ -9,10 +9,22 @@ class ClientInformation : public QDialog {
   Q_OBJECT;
 
 public:
+  enum class IndexItem : uint8_t {
+    address = 0,
+    computer_name,
+    user_name,
+    os_name,
+    cpu_model,
+    max_item
+  };
+
   ClientInformation(Network::Session *session_, QWidget *parent = nullptr);
   ~ClientInformation();
 
 private:
+  static QString getIndexText(const IndexItem section);
+  QString getData(const IndexItem section);
+
   Ui::ClientInformation *ui;
   Network::Session *session;
 };

@@ -41,6 +41,8 @@ public:
 
   inline std::string getHwid(int row) const { return hwid_mapping[row]; };
 
+  Network::Session *getClient(int row) const;
+
 public slots:
   void clientConnected(Network::Session *client);
   void clientDisconnected(Network::Session *client);

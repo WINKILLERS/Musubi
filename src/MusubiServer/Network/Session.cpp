@@ -14,20 +14,21 @@ Session::Session(Handler *handler_, QAbstractSocket *socket_, Session *parent_)
 
   connect(this, &Session::recvClientInformation, this,
           &Session::onClientInformation);
+
+  connect(this, &Session::migratePendingSession, handler,
+          &Handler::migratePendingSession);
 }
 
 Session::~Session() {
+  auto sub_channels_ = sub_channels;
   socket->deleteLater();
 
-  for (auto &sub_channel : sub_channels) {
+  for (auto &sub_channel : sub_channels_) {
     sub_channel->shutdown();
     // Qt will delete sub_channel for us
   }
 
-  sub_channels.clear();
-
-  // Qt will delete window for us
-  windows.clear();
+  closeAllWindow();
 }
 
 bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
@@ -58,9 +59,19 @@ bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
   return socket->flush();
 }
 
-void Session::shutdown() { socket->disconnectFromHost(); }
+void Session::shutdown() {
+  socket->disconnectFromHost();
+  closeAllWindow();
+}
 
-bool Session::openInfoWindow() { return false; }
+void Session::closeAllWindow() {
+  for (auto &window : windows) {
+    window->close();
+    window->deleteLater();
+  }
+
+  windows.clear();
+}
 
 void Session::addSubChannel(Session *sub_channel) {
   sub_channels.emplace_back(sub_channel);
@@ -118,15 +129,7 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
-    auto migrate = handler->migratePendingSession(this);
-    // Server internal error
-    if (migrate != true) {
-      spdlog::error("[{}] session can not migrate", description);
-      sendJsonPacket(GENERATE_PACKET(Bridge::ServerHandshake,
-                                     "Duplicated connection", true));
-      shutdown();
-      return false;
-    }
+    emit migratePendingSession();
 
     bool send = sendJsonPacket(GENERATE_PACKET(
         Bridge::ServerHandshake, "Official Musubi Server", false));

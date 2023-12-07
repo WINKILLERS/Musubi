@@ -56,6 +56,10 @@ QVariant ClientModel::data(const QModelIndex &index, int role) const {
   return QVariant();
 }
 
+Network::Session *ClientModel::getClient(int row) const {
+  return handler->getClient(getHwid(row));
+}
+
 void ClientModel::clientConnected(Network::Session *client) {
   auto row = hwid_mapping.size();
 
@@ -83,7 +87,7 @@ void ClientModel::clientDisconnected(Network::Session *client) {
 QString ClientModel::getHeaderText(const ColumnItem section) {
   QString header;
 
-  switch ((ColumnItem)section) {
+  switch (section) {
   case ColumnItem::location:
     header = tr("Location");
     break;

@@ -8,12 +8,16 @@ Handler::Handler(uint32_t port_, QObject *parent)
     : port(port_), QTcpServer(parent) {}
 
 Handler::~Handler() {
-  for (auto &session : pending_queue) {
-    session->shutdown();
-    session->deleteLater();
+  auto clients_ = clients;
+  auto pending_queue_ = pending_queue;
+
+  for (auto &client : clients_) {
+    client.second->shutdown();
   }
 
-  pending_queue.clear();
+  for (auto &session : pending_queue_) {
+    session->deleteLater();
+  }
 }
 
 void Handler::pause() { pauseAccepting(); }
@@ -37,7 +41,7 @@ void Handler::incomingConnection(qintptr socket_descriptor) {
   pending_queue.emplace_back(session);
 
   connect(session, &Session::disconnected, this,
-          &Handler::handleClientDisconnect);
+          &Handler::handleSessionDisconnect);
 }
 
 Session *Handler::getClient(const std::string &hwid) const {
@@ -49,7 +53,8 @@ Session *Handler::getClient(const std::string &hwid) const {
   }
 }
 
-bool Handler::migratePendingSession(Session *session) {
+bool Handler::migratePendingSession() {
+  auto session = qobject_cast<Session *>(sender());
   auto description = session->getDescription();
 
   // Basic check
@@ -98,7 +103,7 @@ bool Handler::migratePendingSession(Session *session) {
   return true;
 }
 
-void Handler::handleClientDisconnect() {
+void Handler::handleSessionDisconnect() {
   auto session = qobject_cast<Session *>(sender());
   auto description = session->getDescription();
 

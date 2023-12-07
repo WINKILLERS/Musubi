@@ -69,11 +69,11 @@ public:
     return info.value_or(Bridge::ClientInformation()).os_name;
   }
 
-  bool openInfoWindow();
-
-  void shutdown();
+  inline void addWindow(QWidget *window) { windows.emplace_back(window); }
 
 signals:
+  void migratePendingSession();
+
   void disconnected();
 
   DECLARE_SIGNAL(ClientInformation);
@@ -81,6 +81,10 @@ signals:
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
+
+  void shutdown();
+
+  void closeAllWindow();
 
 private:
   // Called from handler when a sub channel connected

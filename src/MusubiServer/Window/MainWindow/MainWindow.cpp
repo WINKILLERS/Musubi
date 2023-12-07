@@ -48,6 +48,8 @@ MainWindow::MainWindow() : ui(new Ui::MusubiServer()), QMainWindow(nullptr) {
 }
 
 MainWindow::~MainWindow() {
+  handler_thread->exit();
+
   handler->deleteLater();
   handler_thread->deleteLater();
   delete ui;
