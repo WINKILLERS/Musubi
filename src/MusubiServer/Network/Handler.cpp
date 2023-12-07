@@ -25,7 +25,7 @@ void Handler::shutdown() { close(); }
 bool Handler::run() { return QTcpServer::listen(QHostAddress::Any, port); };
 
 void Handler::incomingConnection(qintptr socket_descriptor) {
-  auto socket = new QTcpSocket;
+  auto socket = new QTcpSocket();
 
   if (socket->setSocketDescriptor(socket_descriptor) == false) {
     spdlog::error("error while accepting connection");

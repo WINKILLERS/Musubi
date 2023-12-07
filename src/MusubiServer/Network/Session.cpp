@@ -1,8 +1,6 @@
 #include "Session.hpp"
 #include "Handler.hpp"
 #include "magic_enum.hpp"
-#include "qabstractsocket.h"
-#include "qnamespace.h"
 #include <QtConcurrent/QtConcurrent>
 #include <spdlog/spdlog.h>
 
@@ -27,11 +25,9 @@ Session::~Session() {
   }
 
   sub_channels.clear();
-}
 
-void Session::shutdown() {
-  QMetaObject::invokeMethod(socket, &QAbstractSocket::disconnectFromHost,
-                            Qt::QueuedConnection);
+  // Qt will delete window for us
+  windows.clear();
 }
 
 bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
@@ -43,6 +39,8 @@ bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
   spdlog::trace("[{}] sending packet with type: {}, size: {:.2f} KB",
                 description, magic_enum::enum_name(type),
                 (double)buffer.size() / 1024);
+
+  // Make sure we are in current thread
 
   // Send magic
   auto ret = socket->write((char *)&magic, sizeof(magic));
@@ -60,8 +58,13 @@ bool Session::sendJsonPacket(const Bridge::AbstractGenerator &packet) {
   return socket->flush();
 }
 
+void Session::shutdown() { socket->disconnectFromHost(); }
+
+bool Session::openInfoWindow() { return false; }
+
 void Session::addSubChannel(Session *sub_channel) {
   sub_channels.emplace_back(sub_channel);
+  sub_channel->setParent(this);
 
   connect(sub_channel, &Session::disconnected, this,
           &Session::handleSubChannelDisconnect);
@@ -125,7 +128,7 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
-    auto send = sendJsonPacket(GENERATE_PACKET(
+    bool send = sendJsonPacket(GENERATE_PACKET(
         Bridge::ServerHandshake, "Official Musubi Server", false));
     if (send != true) {
       spdlog::error("[{}] session can not reply", description);
@@ -240,9 +243,9 @@ void Session::appendToBuffer() {
     buffer.append(received.cbegin(), received.cend());
 
     // Call base to process the packet
-    auto task =
-        QtConcurrent::run(&Session::processPacket, this, std::move(buffer));
-    // processPacket(buffer);
+    // auto task =
+    //     QtConcurrent::run(&Session::processPacket, this, std::move(buffer));
+    processPacket(std::move(buffer));
 
     // Clear the buffer
     buffer.clear();
@@ -257,7 +260,7 @@ void Session::appendToBuffer() {
 void Session::onClientInformation(
     Bridge::HeaderPtr header,
     std::shared_ptr<Bridge::ClientInformation> packet) {
-  information = *packet;
+  info = *packet;
 }
 
 void Session::handleSubChannelDisconnect() {

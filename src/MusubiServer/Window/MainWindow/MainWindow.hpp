@@ -10,15 +10,23 @@
 
 namespace Window {
 class MainWindow : public QMainWindow {
+  Q_OBJECT;
+
 public:
   MainWindow();
   ~MainWindow();
 
+private slots:
+  void onTableSelectionChanged(const QItemSelection &selected,
+                               const QItemSelection &deselected);
+
 private:
-  Ui::MainWindow *ui;
+  Ui::MusubiServer *ui;
   Widget::ClientTable *client_table;
   Model::ClientModel *client_model;
+  QItemSelectionModel *selection;
   Network::Handler *handler;
+  QThread *handler_thread;
   QToolBar *tool_bar;
   Widget::ViewClientInfo *action_view_info;
 };

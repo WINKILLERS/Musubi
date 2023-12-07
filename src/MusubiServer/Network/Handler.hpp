@@ -16,16 +16,14 @@ public:
 
   inline uint32_t getListeningPort() const { return port; }
 
-  void pause();
-
-  void resume();
-
-  void shutdown();
-
-  bool run();
-
   // Get client controller by hwid
   Session *getClient(const std::string &hwid) const;
+
+public slots:
+  void pause();
+  void resume();
+  void shutdown();
+  bool run();
 
 signals:
   void clientConnected(Session *client);

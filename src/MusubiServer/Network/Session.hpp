@@ -4,6 +4,7 @@
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include "Packet.hpp"
+#include "qwidget.h"
 #include <QAbstractSocket>
 #include <QHostAddress>
 #include <QObject>
@@ -53,38 +54,22 @@ public:
   inline Bridge::Role getRole() const { return role; }
 
   inline std::string getComputerName() const {
-    if (information.has_value()) {
-      return information.value().computer_name;
-    } else {
-      return std::string();
-    }
+    return info.value_or(Bridge::ClientInformation()).computer_name;
   }
 
   inline std::string getUserName() const {
-    if (information.has_value()) {
-      return information.value().user_name;
-    } else {
-      return std::string();
-    }
+    return info.value_or(Bridge::ClientInformation()).user_name;
   }
 
   inline std::string getCpuModel() const {
-    if (information.has_value()) {
-      return information.value().cpu_model;
-    } else {
-      return std::string();
-    }
+    return info.value_or(Bridge::ClientInformation()).cpu_model;
   }
 
   inline std::string getOsName() const {
-    if (information.has_value()) {
-      return information.value().os_name;
-    } else {
-      return std::string();
-    }
+    return info.value_or(Bridge::ClientInformation()).os_name;
   }
 
-  bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
+  bool openInfoWindow();
 
   void shutdown();
 
@@ -93,6 +78,9 @@ signals:
 
   DECLARE_SIGNAL(ClientInformation);
   DECLARE_SIGNAL(Heartbeat);
+
+public slots:
+  bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
 
 private:
   // Called from handler when a sub channel connected
@@ -108,13 +96,15 @@ private:
   uint64_t handshake_id = 0;
   Bridge::Role role = Bridge::Role::unknown;
   std::string hwid;
-  std::optional<Bridge::ClientInformation> information;
+  std::optional<Bridge::ClientInformation> info;
 
   size_t bytes_remain = 0;
   std::string buffer;
 
   Session *parent;
   std::vector<Session *> sub_channels;
+
+  std::vector<QWidget *> windows;
 
   bool processPacket(std::string raw_packet);
   bool dispatchPacket(const Bridge::Parser &parser) const;

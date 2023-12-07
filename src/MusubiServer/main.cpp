@@ -12,8 +12,9 @@ int main(int argc, char *argv[]) {
 
   // Build logger window
   auto logger_window = new Window::Logger(nullptr);
-  logger_window->show();
   logger_window->setAttribute(Qt::WA_DeleteOnClose);
+  logger_window->showMinimized();
+  // logger_window->show();
 
   // Build spdlog sink
   auto qt_logger =

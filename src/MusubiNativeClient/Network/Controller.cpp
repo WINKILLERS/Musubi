@@ -94,7 +94,7 @@ bool Controller::onServerHandshake(const Bridge::Parser &parser) {
   }
 
   // No longer need heartbeat
-  // return createSubChannel(Bridge::Role::heartbeat, 0);
+  return createSubChannel(Bridge::Role::heartbeat, 0);
   return true;
 }
 } // namespace Network
