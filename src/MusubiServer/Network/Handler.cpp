@@ -112,11 +112,12 @@ void Handler::handleSessionDisconnect() {
     if (getClient(session->getHwid()) == session) {
       spdlog::info("[{}] disconnected", description);
 
-      clients.erase(session->getHwid());
       emit clientDisconnected(session);
+      clients.erase(session->getHwid());
     }
 
-    session->deleteLater();
+    // Model now will delete the session
+    // session->deleteLater();
   } else if (session->getRole() == Bridge::Role::unknown) {
     auto iter = std::find(pending_queue.begin(), pending_queue.end(), session);
     pending_queue.erase(iter);

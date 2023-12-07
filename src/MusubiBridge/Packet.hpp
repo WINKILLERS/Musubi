@@ -23,7 +23,9 @@ enum class Type : uint32_t {
   client_handshake,
   heartbeat,
   client_information,
+  response_get_processes,
   server_handshake = 512,
+  request_get_processes,
   max_type
 };
 

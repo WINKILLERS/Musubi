@@ -82,6 +82,8 @@ void ClientModel::clientDisconnected(Network::Session *client) {
   location_mapping.erase(client->getHwid());
 
   emitRowChanged(row);
+
+  client->deleteLater();
 }
 
 QString ClientModel::getHeaderText(const ColumnItem section) {

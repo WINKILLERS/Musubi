@@ -15,6 +15,7 @@ public:
     user_name,
     os_name,
     cpu_model,
+    anti_virus,
     max_item
   };
 
@@ -24,6 +25,7 @@ public:
 private:
   static QString getIndexText(const IndexItem section);
   QString getData(const IndexItem section);
+  QString getAntiVirus();
 
   Ui::ClientInformation *ui;
   Network::Session *session;

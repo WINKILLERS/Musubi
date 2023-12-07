@@ -1,4 +1,5 @@
 #include "Factory.hpp"
+#include "GetProcesses.hpp"
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include <exception>
@@ -112,6 +113,8 @@ bool Parser::parseJson(const std::string &header_data,
     CASE_AND_PARSE(ServerHandshake);
     CASE_AND_PARSE(ClientInformation);
     CASE_AND_PARSE(Heartbeat);
+    CASE_AND_PARSE(ResponseGetProcesses);
+    CASE_AND_PARSE(RequestGetProcesses);
   case Type::header:
   case Type::unknown:
   default:

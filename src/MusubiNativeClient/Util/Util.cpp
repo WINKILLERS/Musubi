@@ -1,5 +1,5 @@
 #include "Util.hpp"
-#include <Windows.h>
+#include <TlHelp32.h>
 #include <infoware/infoware.hpp>
 #include <utf8.h>
 
@@ -7,7 +7,23 @@
 #include <security.h>
 
 namespace Util {
-Bridge::ClientInformation getClientInformation() {
+std::wstring utf8to16(const std::string &u8str) {
+  std::wstring u16str;
+  utf8::utf8to16(u8str.cbegin(), u8str.cend(), std::back_inserter(u16str));
+  return u16str;
+}
+
+std::string utf16to8(const std::wstring &u16str) {
+  std::string u8str;
+  utf8::utf16to8(u16str.cbegin(), u16str.cend(), std::back_inserter(u8str));
+  return u8str;
+}
+
+std::string utf8to8(const std::u8string &u8str) {
+  return std::string(u8str.cbegin(), u8str.cend());
+}
+
+Bridge::ClientInformation getInformation() {
   Bridge::ClientInformation information;
 
   information.cpu_model = iware::cpu::model_name();
@@ -33,5 +49,34 @@ Bridge::ClientInformation getClientInformation() {
   delete[] computer_buffer;
 
   return information;
+}
+
+std::optional<Bridge::ResponseGetProcesses> getProcesses() {
+  PROCESSENTRY32W pe32;
+  Bridge::ResponseGetProcesses packet;
+
+  auto handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+  if (handle == INVALID_HANDLE_VALUE) {
+    return std::nullopt;
+  }
+
+  pe32.dwSize = sizeof(PROCESSENTRY32W);
+  if (Process32FirstW(handle, &pe32) == false) {
+    CloseHandle(handle);
+    return std::nullopt;
+  }
+
+  do {
+    Bridge::Process process;
+    process.name = Util::utf16to8(pe32.szExeFile);
+    process.pid = pe32.th32ProcessID;
+    process.ppid = pe32.th32ParentProcessID;
+    packet.addProcess(process);
+  } while (Process32NextW(handle, &pe32));
+
+  CloseHandle(handle);
+
+  return packet;
 }
 } // namespace Util

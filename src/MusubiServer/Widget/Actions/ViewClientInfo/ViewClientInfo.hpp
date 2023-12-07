@@ -9,9 +9,8 @@ class ViewClientInfo : public QAction {
   Q_OBJECT;
 
 public:
-  explicit ViewClientInfo(QItemSelectionModel *selection_,
-                          Model::ClientModel *model_,
-                          QObject *parent = nullptr);
+  ViewClientInfo(QItemSelectionModel *selection_, Model::ClientModel *model_,
+                 QObject *parent = nullptr);
 
 public slots:
   void onTriggered();

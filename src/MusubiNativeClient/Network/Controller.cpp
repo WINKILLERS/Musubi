@@ -4,12 +4,14 @@
 #include "Util/Util.hpp"
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
+#include <utf8.h>
 
 namespace Network {
 void Controller::run() {
   performHandshake(Bridge::Role::controller);
 
   REGISTER_CALLBACK(ServerHandshake, Controller);
+  REGISTER_CALLBACK(RequestGetProcesses, Controller);
 
   while (true) {
     auto parser = readJsonPacket();
@@ -86,7 +88,7 @@ bool Controller::onServerHandshake(const Bridge::Parser &parser) {
   }
 
   auto ret = sendJsonPacket(
-      GENERATE_PACKET(Bridge::ClientInformation, Util::getClientInformation()));
+      GENERATE_PACKET(Bridge::ClientInformation, Util::getInformation()));
 
   if (ret != true) {
     spdlog::error("can not reply server handshake");
@@ -95,6 +97,27 @@ bool Controller::onServerHandshake(const Bridge::Parser &parser) {
 
   // No longer need heartbeat
   return createSubChannel(Bridge::Role::heartbeat, 0);
+  return true;
+}
+
+bool Controller::onRequestGetProcesses(const Bridge::Parser &parser) {
+  auto opt_response = Util::getProcesses();
+
+  if (opt_response.has_value() == false) {
+    spdlog::error("can not get processes");
+    return false;
+  }
+
+  auto response = opt_response.value();
+
+  auto ret =
+      sendJsonPacket(GENERATE_PACKET(Bridge::ResponseGetProcesses, response));
+
+  if (ret != true) {
+    spdlog::error("can not reply get processes");
+    return false;
+  }
+
   return true;
 }
 } // namespace Network

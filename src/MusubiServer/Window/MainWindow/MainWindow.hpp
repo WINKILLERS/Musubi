@@ -2,7 +2,8 @@
 #define MAIN_WINDOW_HPP
 #include "Model/ClientModel/ClientModel.hpp"
 #include "Network/Handler.hpp"
-#include "Widget/ClientAction/ViewClientInfo/ViewClientInfo.hpp"
+#include "Widget/Actions/ViewAbout/ViewAbout.hpp"
+#include "Widget/Actions/ViewClientInfo/ViewClientInfo.hpp"
 #include "Widget/ClientTable/ClientTable.hpp"
 #include "ui_MainWinodw.h"
 #include <QMainWindow>
@@ -29,6 +30,7 @@ private:
   QThread *handler_thread;
   QToolBar *tool_bar;
   Widget::ViewClientInfo *action_view_info;
+  Widget::ViewAbout *action_view_about;
 };
 } // namespace Window
 #endif

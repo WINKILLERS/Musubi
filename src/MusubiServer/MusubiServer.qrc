@@ -3,6 +3,7 @@
         <file>MusubiServer.ico</file>
     </qresource>
     <qresource prefix="/Widget">
-        <file>Widget/ClientAction/ViewClientInfo/ViewClientInfo.png</file>
+        <file>Widget/Actions/ViewClientInfo/ViewClientInfo.png</file>
+        <file>Widget/Actions/ViewAbout/ViewAbout.png</file>
     </qresource>
 </RCC>

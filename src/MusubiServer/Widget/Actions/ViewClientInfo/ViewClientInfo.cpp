@@ -6,8 +6,7 @@ namespace Widget {
 ViewClientInfo::ViewClientInfo(QItemSelectionModel *selection_,
                                Model::ClientModel *model_, QObject *parent)
     : QAction(
-          QIcon(
-              ":/Widget/Widget/ClientAction/ViewClientInfo/ViewClientInfo.png"),
+          QIcon(":/Widget/Widget/Actions/ViewClientInfo/ViewClientInfo.png"),
           tr("View Client Info"), parent),
       selection(selection_), model(model_) {
   connect(this, &QAction::triggered, this, &ViewClientInfo::onTriggered);

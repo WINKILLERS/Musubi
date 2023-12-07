@@ -14,6 +14,8 @@ Session::Session(Handler *handler_, QAbstractSocket *socket_, Session *parent_)
 
   connect(this, &Session::recvClientInformation, this,
           &Session::onClientInformation);
+  connect(this, &Session::recvResponseGetProcesses, this,
+          &Session::onResponseGetProcesses);
 
   connect(this, &Session::migratePendingSession, handler,
           &Handler::migratePendingSession);
@@ -139,6 +141,13 @@ bool Session::processPacket(std::string raw_packet) {
       return false;
     }
 
+    send = sendJsonPacket(GENERATE_PACKET(Bridge::RequestGetProcesses));
+    if (send != true) {
+      spdlog::error("[{}] session can get processes", description);
+      shutdown();
+      return false;
+    }
+
     handshake_id = id;
 
     return true;
@@ -166,6 +175,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
   switch (type) {
     CASE_AND_EMIT(ClientInformation);
     CASE_AND_EMIT(Heartbeat);
+    CASE_AND_EMIT(ResponseGetProcesses);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;
@@ -264,6 +274,12 @@ void Session::onClientInformation(
     Bridge::HeaderPtr header,
     std::shared_ptr<Bridge::ClientInformation> packet) {
   info = *packet;
+}
+
+void Session::onResponseGetProcesses(
+    Bridge::HeaderPtr header,
+    std::shared_ptr<Bridge::ResponseGetProcesses> packet) {
+  processes = *packet;
 }
 
 void Session::handleSubChannelDisconnect() {

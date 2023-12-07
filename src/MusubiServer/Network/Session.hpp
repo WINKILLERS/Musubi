@@ -1,6 +1,7 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 #include "Factory.hpp"
+#include "GetProcesses.hpp"
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include "Packet.hpp"
@@ -69,6 +70,10 @@ public:
     return info.value_or(Bridge::ClientInformation()).os_name;
   }
 
+  inline std::vector<Bridge::Process> getProcesses() const {
+    return processes.value_or(Bridge::ResponseGetProcesses()).processes;
+  }
+
   inline void addWindow(QWidget *window) { windows.emplace_back(window); }
 
 signals:
@@ -78,6 +83,7 @@ signals:
 
   DECLARE_SIGNAL(ClientInformation);
   DECLARE_SIGNAL(Heartbeat);
+  DECLARE_SIGNAL(ResponseGetProcesses);
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
@@ -101,6 +107,7 @@ private:
   Bridge::Role role = Bridge::Role::unknown;
   std::string hwid;
   std::optional<Bridge::ClientInformation> info;
+  std::optional<Bridge::ResponseGetProcesses> processes;
 
   size_t bytes_remain = 0;
   std::string buffer;
@@ -118,6 +125,7 @@ private slots:
   void handleSubChannelDisconnect();
 
   DECLARE_SLOT(ClientInformation);
+  DECLARE_SLOT(ResponseGetProcesses);
 };
 } // namespace Network
 #endif
