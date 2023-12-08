@@ -69,8 +69,8 @@ void Session::shutdown() {
 
 void Session::closeAllWindow() {
   for (auto &window : windows) {
-    window->close();
-    window->deleteLater();
+    QMetaObject::invokeMethod(window, &QWidget::close);
+    QMetaObject::invokeMethod(window, &QWidget::deleteLater);
   }
 
   windows.clear();
@@ -174,6 +174,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
     CASE_AND_EMIT(ResponseGetProcesses);
     CASE_AND_EMIT(ResponseTerminateProcess);
     CASE_AND_EMIT(ResponseStartProcess);
+    CASE_AND_EMIT(ResponseGetFiles);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;
@@ -255,7 +256,7 @@ void Session::appendToBuffer() {
 
     // Call base to process the packet
     // auto task =
-    //     QtConcurrent::run(&Session::processPacket, this, std::move(buffer));
+    //    QtConcurrent::run(&Session::processPacket, this, std::move(buffer));
     processPacket(std::move(buffer));
 
     // Clear the buffer

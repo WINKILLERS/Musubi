@@ -8,25 +8,26 @@ ProcessManager::ProcessManager(Network::Session *session_, QWidget *parent)
     : ui(new Ui::ProcessManager()), QDialog(parent), session(session_) {
   ui->setupUi(this);
 
-  refreshCompleted();
-
   connect(session, &Network::Session::recvResponseGetProcesses, this,
-          &ProcessManager::refreshCompleted);
+          &ProcessManager::onResponseGetProcesses);
   connect(session, &Network::Session::recvResponseTerminateProcess, this,
           &ProcessManager::onResponseTerminateProcess);
   connect(session, &Network::Session::recvResponseStartProcess, this,
           &ProcessManager::onResponseStartProcess);
 
-  connect(this, &ProcessManager::terminatingProcess, session,
+  connect(this, &ProcessManager::refreshing, session,
+          &Network::Session::refreshProcesses);
+  connect(this, &ProcessManager::terminating, session,
           &Network::Session::terminateProcess);
-  connect(this, &ProcessManager::startingNewProcess, session,
+  connect(this, &ProcessManager::starting, session,
           &Network::Session::startProcess);
 
-  connect(ui->refresh, &QPushButton::clicked, session,
-          &Network::Session::refreshProcesses);
+  connect(ui->refresh, &QPushButton::clicked, this, &ProcessManager::refresh);
   connect(ui->start, &QPushButton::clicked, this, &ProcessManager::start);
   connect(ui->terminate, &QPushButton::clicked, this,
           &ProcessManager::terminate);
+
+  refresh();
 }
 
 ProcessManager::~ProcessManager() { delete ui; }
@@ -80,7 +81,37 @@ QString ProcessManager::getData(const Bridge::Process &process,
   return text;
 }
 
-void ProcessManager::refreshCompleted() {
+void ProcessManager::refresh() { emit refreshing(); }
+
+void ProcessManager::start() {
+  auto input = new NewProcess("path\\to\\program.exe", this);
+  auto action = input->exec();
+  if (action == QDialog::Accepted) {
+    Bridge::RequestStartProcess request(input->getPath(),
+                                        Bridge::ShowType::show);
+
+    emit starting(request);
+  }
+  input->deleteLater();
+}
+
+void ProcessManager::terminate() {
+  auto selection = ui->table->selectedItems();
+  Bridge::RequestTerminateProcess request;
+
+  for (const auto &item : selection) {
+    if (item->column() == ColumnItem::pid) {
+      auto pid = item->data(Qt::DisplayRole).toULongLong();
+      request.addProcess(pid);
+    }
+  }
+
+  emit terminating(request);
+}
+
+void ProcessManager::onResponseGetProcesses(
+    Bridge ::HeaderPtr header,
+    std ::shared_ptr<Bridge ::ResponseGetProcesses> packet) {
   const auto &processes = session->getProcesses();
 
   ui->table->clear();
@@ -101,32 +132,6 @@ void ProcessManager::refreshCompleted() {
     }
     index++;
   }
-}
-
-void ProcessManager::start() {
-  auto input = new NewProcess("path\\to\\program.exe", this);
-  auto action = input->exec();
-  if (action == QDialog::Accepted) {
-    Bridge::RequestStartProcess request(input->getPath(),
-                                        Bridge::ShowType::show);
-
-    emit startingNewProcess(request);
-  }
-  input->deleteLater();
-}
-
-void ProcessManager::terminate() {
-  auto selection = ui->table->selectedItems();
-  Bridge::RequestTerminateProcess request;
-
-  for (const auto &item : selection) {
-    if (item->column() == ColumnItem::pid) {
-      auto pid = item->data(Qt::DisplayRole).toULongLong();
-      request.addProcess(pid);
-    }
-  }
-
-  emit terminatingProcess(request);
 }
 
 void ProcessManager::onResponseTerminateProcess(

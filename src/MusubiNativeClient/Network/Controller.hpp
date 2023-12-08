@@ -33,6 +33,7 @@ private:
   DECLARE_CALLBACK(RequestGetProcesses);
   DECLARE_CALLBACK(RequestTerminateProcess);
   DECLARE_CALLBACK(RequestStartProcess);
+  DECLARE_CALLBACK(RequestGetFiles);
 };
 } // namespace Network
 #endif

@@ -17,7 +17,8 @@ target("MusubiServer")
     add_packages("jwt-cpp~Dynamic")
     add_packages("nlohmann_json~Dynamic")
     add_packages("fmt~Dynamic")
-    
+    add_packages("utfcpp~Dynamic")
+
     add_frameworks("QtNetwork","QtGui","QtCore")
 
     add_deps("MusubiBridgeDynamic")

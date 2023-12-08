@@ -15,8 +15,9 @@ public:
   ~ProcessManager();
 
 signals:
-  void terminatingProcess(const Bridge::RequestTerminateProcess packet);
-  void startingNewProcess(const Bridge::RequestStartProcess packet);
+  void refreshing();
+  void terminating(const Bridge::RequestTerminateProcess packet);
+  void starting(const Bridge::RequestStartProcess packet);
 
 private:
   static QString getColumnText(const ColumnItem section);
@@ -27,9 +28,10 @@ private:
   Network::Session *session;
 
 private slots:
-  void refreshCompleted();
+  void refresh();
   void start();
   void terminate();
+  DECLARE_SLOT(ResponseGetProcesses);
   DECLARE_SLOT(ResponseTerminateProcess);
   DECLARE_SLOT(ResponseStartProcess);
 };

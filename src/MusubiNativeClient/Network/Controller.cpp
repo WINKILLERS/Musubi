@@ -1,4 +1,5 @@
 #include "Controller.hpp"
+#include "GetFiles.hpp"
 #include "Handshake.hpp"
 #include "HeartbeatChannel.hpp"
 #include "StartProcess.hpp"
@@ -16,6 +17,7 @@ void Controller::run() {
   REGISTER_CALLBACK(RequestGetProcesses, Controller);
   REGISTER_CALLBACK(RequestTerminateProcess, Controller);
   REGISTER_CALLBACK(RequestStartProcess, Controller);
+  REGISTER_CALLBACK(RequestGetFiles, Controller);
 
   while (true) {
     auto parser = readJsonPacket();
@@ -158,6 +160,22 @@ bool Controller::onRequestStartProcess(const Bridge::Parser &parser) {
 
   if (ret != true) {
     spdlog::error("can not reply start process");
+    return false;
+  }
+
+  return true;
+}
+
+bool Controller::onRequestGetFiles(const Bridge::Parser &parser) {
+  GET_BODY(RequestGetFiles);
+
+  auto response = Util::getFiles(body);
+
+  auto ret =
+      sendJsonPacket(GENERATE_PACKET(Bridge::ResponseGetFiles, response));
+
+  if (ret != true) {
+    spdlog::error("can not reply get files");
     return false;
   }
 

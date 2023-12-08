@@ -7,5 +7,7 @@
         <file>Widget/Actions/ViewProcesses/ViewProcesses.png</file>
         <file>Widget/Actions/ViewFiles/ViewFiles.png</file>
         <file>Widget/Actions/ViewLicense/ViewLicense.png</file>
+        <file>Window/FileManager/file.png</file>
+        <file>Window/FileManager/folder.png</file>
     </qresource>
 </RCC>

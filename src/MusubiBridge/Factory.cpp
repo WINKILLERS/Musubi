@@ -4,6 +4,7 @@
 #include "Heartbeat.hpp"
 #include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
+#include <GetFiles.hpp>
 #include <exception>
 #include <memory>
 #include <zstd.h>
@@ -121,6 +122,8 @@ bool Parser::parseJson(const std::string &header_data,
     CASE_AND_PARSE(RequestTerminateProcess);
     CASE_AND_PARSE(RequestStartProcess);
     CASE_AND_PARSE(ResponseStartProcess);
+    CASE_AND_PARSE(RequestGetFiles);
+    CASE_AND_PARSE(ResponseGetFiles);
   case Type::header:
   case Type::unknown:
   default:

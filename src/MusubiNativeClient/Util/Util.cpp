@@ -1,6 +1,9 @@
 #include "Util.hpp"
 #include <TlHelp32.h>
+#include <bitset>
 #include <boost/algorithm/string.hpp>
+#include <filesystem>
+#include <fmt/format.h>
 #include <infoware/infoware.hpp>
 #include <shellapi.h>
 #include <utf8.h>
@@ -157,6 +160,49 @@ startProcess(const std::shared_ptr<Bridge::RequestStartProcess> packet) {
 
   response.status.path = packet->path;
   response.status.error_code = GetLastError();
+
+  return response;
+}
+
+Bridge::ResponseGetFiles
+getFiles(const std::shared_ptr<Bridge::RequestGetFiles> packet) {
+  Bridge::ResponseGetFiles response;
+  const auto &directory = packet->directory;
+  std::error_code error_code;
+
+  if (directory.empty()) {
+    std::bitset<32> volumes = GetLogicalDrives();
+    for (char i = 0; i < volumes.size(); i++) {
+      if (volumes[i]) {
+        Bridge::File file;
+        file.name = fmt::format("{}:\\", (char)('A' + i));
+        file.is_directory = true;
+        file.size = 0;
+        file.last_write_time = 0;
+        response.addFile(file);
+      }
+    }
+
+    response.error_code = GetLastError();
+  } else {
+    for (const auto &entry : std::filesystem::directory_iterator(
+             utf8to16(directory),
+             std::filesystem::directory_options::skip_permission_denied |
+                 std::filesystem::directory_options::follow_directory_symlink,
+             error_code)) {
+      Bridge::File file;
+      file.name = utf8to8(entry.path().filename().u8string());
+      file.is_directory = entry.is_directory();
+      file.size = entry.file_size();
+      file.last_write_time =
+          std::chrono::duration_cast<std::chrono::milliseconds>(
+              entry.last_write_time().time_since_epoch())
+              .count();
+      response.addFile(file);
+    }
+
+    response.error_code = error_code.value();
+  }
 
   return response;
 }

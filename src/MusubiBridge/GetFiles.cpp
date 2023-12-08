@@ -19,10 +19,16 @@ void RequestGetFiles::parseJson(const std::string &json) {
 std::string ResponseGetFiles::buildJson() const {
   nlohmann::json packet;
 
+  EMPLACE_PARAM(error_code);
+
+  auto &node = packet["files"];
   for (const auto &file : files) {
     nlohmann::json file_json;
     file_json["name"] = file.name;
-    packet.emplace_back(file_json);
+    file_json["is_directory"] = file.is_directory;
+    file_json["size"] = file.size;
+    file_json["last_write_time"] = file.last_write_time;
+    node.emplace_back(file_json);
   }
 
   return packet.dump(-1, ' ', true);
@@ -31,9 +37,15 @@ std::string ResponseGetFiles::buildJson() const {
 void ResponseGetFiles::parseJson(const std::string &json) {
   const nlohmann::json packet = nlohmann::json::parse(json);
 
-  for (const auto &file_json : packet) {
+  EXTRACT_PARAM(error_code);
+
+  auto &node = packet["files"];
+  for (const auto &file_json : node) {
     File file;
     file.name = file_json["name"];
+    file.is_directory = file_json["is_directory"];
+    file.size = file_json["size"];
+    file.last_write_time = file_json["last_write_time"];
     files.emplace_back(file);
   }
 }

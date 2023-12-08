@@ -1,6 +1,7 @@
 #ifndef SESSION_HPP
 #define SESSION_HPP
 #include "Factory.hpp"
+#include "GetFiles.hpp"
 #include "GetProcesses.hpp"
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
@@ -95,6 +96,7 @@ signals:
   DECLARE_SIGNAL(ResponseGetProcesses);
   DECLARE_SIGNAL(ResponseTerminateProcess);
   DECLARE_SIGNAL(ResponseStartProcess);
+  DECLARE_SIGNAL(ResponseGetFiles);
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
@@ -107,6 +109,7 @@ public slots:
   DECLARE_PACKET_SLOT_WITH_PARAM(terminateProcess,
                                  Bridge::RequestTerminateProcess);
   DECLARE_PACKET_SLOT_WITH_PARAM(startProcess, Bridge::RequestStartProcess);
+  DECLARE_PACKET_SLOT_WITH_PARAM(refreshFiles, Bridge::RequestGetFiles);
 
 private:
   // Called from handler when a sub channel connected
