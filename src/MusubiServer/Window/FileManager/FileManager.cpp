@@ -84,9 +84,9 @@ QString FileManager::getData(const Bridge::File &file,
 }
 
 QString FileManager::getTime(uint64_t timestamp) {
-  auto time = std::chrono::sys_time<std::chrono::milliseconds>(
+  auto time = std::chrono::time_point<std::chrono::file_clock>(
       std::chrono::milliseconds(timestamp));
-  return QString::fromStdString(fmt::format("{:%FT%T%Oz}\n", time));
+  return QString::fromStdString(std::format("{:%F %T}", time));
 }
 
 QIcon FileManager::getIcon(const Bridge::File &file) {
