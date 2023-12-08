@@ -175,6 +175,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
     CASE_AND_EMIT(ResponseTerminateProcess);
     CASE_AND_EMIT(ResponseStartProcess);
     CASE_AND_EMIT(ResponseGetFiles);
+    CASE_AND_EMIT(ResponseRemoveFiles);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;

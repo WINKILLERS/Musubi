@@ -34,6 +34,7 @@ private:
   DECLARE_CALLBACK(RequestTerminateProcess);
   DECLARE_CALLBACK(RequestStartProcess);
   DECLARE_CALLBACK(RequestGetFiles);
+  DECLARE_CALLBACK(RequestRemoveFiles);
 };
 } // namespace Network
 #endif

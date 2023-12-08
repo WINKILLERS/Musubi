@@ -6,6 +6,7 @@
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include "Packet.hpp"
+#include "RemoveFiles.hpp"
 #include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include <QAbstractSocket>
@@ -97,6 +98,7 @@ signals:
   DECLARE_SIGNAL(ResponseTerminateProcess);
   DECLARE_SIGNAL(ResponseStartProcess);
   DECLARE_SIGNAL(ResponseGetFiles);
+  DECLARE_SIGNAL(ResponseRemoveFiles);
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
@@ -110,6 +112,7 @@ public slots:
                                  Bridge::RequestTerminateProcess);
   DECLARE_PACKET_SLOT_WITH_PARAM(startProcess, Bridge::RequestStartProcess);
   DECLARE_PACKET_SLOT_WITH_PARAM(refreshFiles, Bridge::RequestGetFiles);
+  DECLARE_PACKET_SLOT_WITH_PARAM(removeFiles, Bridge::RequestRemoveFiles);
 
 private:
   // Called from handler when a sub channel connected

@@ -13,11 +13,16 @@ FileManager::FileManager(Network::Session *session_, QWidget *parent)
 
   connect(session, &Network::Session::recvResponseGetFiles, this,
           &FileManager::onResponseGetFiles);
+  connect(session, &Network::Session::recvResponseRemoveFiles, this,
+          &FileManager::onResponseRemoveFiles);
 
   connect(this, &FileManager::refreshing, session,
           &Network::Session::refreshFiles);
+  connect(this, &FileManager::removing, session,
+          &Network::Session::removeFiles);
 
   connect(ui->refresh, &QPushButton::clicked, this, &FileManager::refresh);
+  connect(ui->remove, &QPushButton::clicked, this, &FileManager::remove);
 
   connect(ui->table, &QTableWidget::cellDoubleClicked, this,
           &FileManager::openDirectoryByRow);
@@ -25,9 +30,8 @@ FileManager::FileManager(Network::Session *session_, QWidget *parent)
           &FileManager::openDirectoryByPath);
   connect(ui->previous, &QPushButton::clicked, this, &FileManager::previous);
   connect(ui->next, &QPushButton::clicked, this, &FileManager::next);
-
-  ui->next->setEnabled(false);
-  ui->previous->setEnabled(false);
+  connect(ui->table, &QTableWidget::itemSelectionChanged, this,
+          &FileManager::selectionChanged);
 
   refresh();
 }
@@ -97,6 +101,19 @@ QIcon FileManager::getIcon(const Bridge::File &file) {
   }
 }
 
+std::vector<std::string> FileManager::getSelections() {
+  std::vector<std::string> selections;
+
+  for (const auto &item : ui->table->selectedItems()) {
+    if (item->column() == ColumnItem::name) {
+      selections.emplace_back(
+          item->data(Qt::DisplayRole).toString().toStdString());
+    }
+  }
+
+  return selections;
+}
+
 void FileManager::openDirectoryByRow(int row, int column) {
   auto directory_name = ui->table->item(row, ColumnItem::name)
                             ->data(Qt::DisplayRole)
@@ -150,6 +167,7 @@ void FileManager::refresh() {
   request.directory = Util::utf8to8(current_directory.u8string());
 
   ui->table->setEnabled(false);
+
   emit refreshing(request);
 }
 
@@ -201,6 +219,18 @@ void FileManager::next() {
   refresh();
 
   return;
+}
+
+void FileManager::remove() {
+  auto selections = getSelections();
+  Bridge::RequestRemoveFiles request;
+
+  for (const auto &selection : selections) {
+    request.addPath(Util::utf8to8(
+        (current_directory / Util::utf8to16(selection)).u8string()));
+  }
+
+  emit removing(request);
 }
 
 void FileManager::onResponseGetFiles(
@@ -283,5 +313,31 @@ void FileManager::onResponseGetFiles(
   }
 
   ui->table->setEnabled(true);
+}
+
+void FileManager::onResponseRemoveFiles(
+    Bridge ::HeaderPtr header,
+    std ::shared_ptr<Bridge ::ResponseRemoveFiles> packet) {
+  const auto &statuses = packet->statuses;
+  QString text;
+
+  for (const auto &status : statuses) {
+    auto path = QString::fromStdString(status.path);
+    auto error_code = status.error_code;
+    text.append(tr("Removed %1, status: %2\n").arg(path).arg(error_code));
+  }
+
+  QMessageBox::information(this, tr("Remove File"), text);
+
+  refresh();
+}
+
+void FileManager::selectionChanged() {
+  auto has_selection = ui->table->selectedItems().empty() != true;
+
+  ui->download->setEnabled(has_selection);
+  ui->open->setEnabled(has_selection);
+  ui->rename->setEnabled(has_selection);
+  ui->remove->setEnabled(has_selection);
 }
 } // namespace Window

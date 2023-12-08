@@ -2,6 +2,7 @@
 #include "GetFiles.hpp"
 #include "Handshake.hpp"
 #include "HeartbeatChannel.hpp"
+#include "RemoveFiles.hpp"
 #include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include "Util/Util.hpp"
@@ -18,6 +19,7 @@ void Controller::run() {
   REGISTER_CALLBACK(RequestTerminateProcess, Controller);
   REGISTER_CALLBACK(RequestStartProcess, Controller);
   REGISTER_CALLBACK(RequestGetFiles, Controller);
+  REGISTER_CALLBACK(RequestRemoveFiles, Controller);
 
   while (true) {
     auto parser = readJsonPacket();
@@ -181,4 +183,21 @@ bool Controller::onRequestGetFiles(const Bridge::Parser &parser) {
 
   return true;
 }
+
+bool Controller::onRequestRemoveFiles(const Bridge::Parser &parser) {
+  GET_BODY(RequestRemoveFiles);
+
+  auto response = Util::removeFiles(body);
+
+  auto ret =
+      sendJsonPacket(GENERATE_PACKET(Bridge::ResponseRemoveFiles, response));
+
+  if (ret != true) {
+    spdlog::error("can not reply remove files");
+    return false;
+  }
+
+  return true;
+}
+
 } // namespace Network

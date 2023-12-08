@@ -2,6 +2,7 @@
 #include "GetProcesses.hpp"
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
+#include "RemoveFiles.hpp"
 #include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include <GetFiles.hpp>
@@ -124,6 +125,8 @@ bool Parser::parseJson(const std::string &header_data,
     CASE_AND_PARSE(ResponseStartProcess);
     CASE_AND_PARSE(RequestGetFiles);
     CASE_AND_PARSE(ResponseGetFiles);
+    CASE_AND_PARSE(RequestRemoveFiles);
+    CASE_AND_PARSE(ResponseRemoveFiles);
   case Type::header:
   case Type::unknown:
   default:

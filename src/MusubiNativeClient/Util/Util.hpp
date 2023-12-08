@@ -3,6 +3,7 @@
 #include "GetFiles.hpp"
 #include "GetProcesses.hpp"
 #include "Handshake.hpp"
+#include "RemoveFiles.hpp"
 #include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include <Windows.h>
@@ -26,5 +27,8 @@ startProcess(const std::shared_ptr<Bridge::RequestStartProcess> packet);
 
 Bridge::ResponseGetFiles
 getFiles(const std::shared_ptr<Bridge::RequestGetFiles> packet);
+
+Bridge::ResponseRemoveFiles
+removeFiles(const std::shared_ptr<Bridge::RequestRemoveFiles> packet);
 } // namespace Util
 #endif

@@ -22,6 +22,7 @@ public:
 
 signals:
   void refreshing(const Bridge::RequestGetFiles packet);
+  void removing(const Bridge::RequestRemoveFiles packet);
 
 private:
   enum class Operation { previous, next, user_open };
@@ -30,6 +31,7 @@ private:
   static QString getData(const Bridge::File &file, const ColumnItem section);
   static QString getTime(uint64_t timestamp);
   QIcon getIcon(const Bridge::File &file);
+  std::vector<std::string> getSelections();
 
   Ui::FileManager *ui;
   Network::Session *session;
@@ -49,7 +51,11 @@ private slots:
   void refresh();
   void previous();
   void next();
+  void remove();
   DECLARE_SLOT(ResponseGetFiles);
+  DECLARE_SLOT(ResponseRemoveFiles);
+
+  void selectionChanged();
 };
 } // namespace Window
 #endif

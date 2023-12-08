@@ -206,4 +206,23 @@ getFiles(const std::shared_ptr<Bridge::RequestGetFiles> packet) {
 
   return response;
 }
+
+Bridge::ResponseRemoveFiles
+removeFiles(const std::shared_ptr<Bridge::RequestRemoveFiles> packet) {
+  const auto &paths = packet->paths;
+  Bridge::ResponseRemoveFiles response;
+
+  for (const auto &path : paths) {
+    std::error_code error_code;
+    Bridge::RemoveStatus status;
+
+    std::filesystem::remove_all(utf8to16(path), error_code);
+    status.path = path;
+    status.error_code = error_code.value();
+
+    response.addStatus(status);
+  }
+
+  return response;
+}
 } // namespace Util

@@ -32,11 +32,13 @@ enum class Type : uint32_t {
   response_terminate_process,
   response_start_process,
   response_get_files,
+  response_remove_files,
   server_handshake = 512,
   request_get_processes,
   request_terminate_process,
   request_start_process,
   request_get_files,
+  request_remove_files,
   max_type
 };
 
