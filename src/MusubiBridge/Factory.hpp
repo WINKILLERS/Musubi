@@ -5,7 +5,16 @@
 #include <string>
 #include <type_traits>
 
+/**
+ * @brief Generate packet with type
+ *
+ */
 #define GENERATE_PACKET(t, ...) ((Bridge::Generator<t>((t(__VA_ARGS__)))))
+
+/**
+ * @brief Generate packet with type and args
+ *
+ */
 #define GENERATE_PACKET_WITH_ID(t, id, ...)                                    \
   ((Bridge::Generator<t>((t(__VA_ARGS__)), id)))
 
@@ -21,12 +30,42 @@ class AbstractGenerator {
 public:
   virtual ~AbstractGenerator() = default;
 
+  /**
+   * @brief Build packet in json format
+   *
+   * @return std::string
+   */
   virtual std::string buildJson() const = 0;
+
+  /**
+   * @brief Set the id of the packet
+   *
+   * @param id Id of the packet
+   */
   virtual void setId(const uint64_t id) = 0;
+
+  /**
+   * @brief Get the id of the packet
+   *
+   * @return uint64_t
+   */
   virtual uint64_t getId() const = 0;
+
+  /**
+   * @brief Get the type of the packet
+   *
+   * @return Type
+   */
   virtual Type getType() const = 0;
 
 protected:
+  /**
+   * @brief The function used for generating packet
+   *
+   * @param header_data Packet header data
+   * @param body_data Packet body data
+   * @return std::string
+   */
   static std::string generate(const std::string &header_data,
                               const std::string &body_data);
 };
