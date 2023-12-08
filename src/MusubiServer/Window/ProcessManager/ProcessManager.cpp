@@ -1,4 +1,6 @@
 #include "ProcessManager.hpp"
+#include "NewProcess/NewProcess.hpp"
+#include <QLineEdit>
 #include <QMessageBox>
 
 namespace Window {
@@ -11,10 +13,14 @@ ProcessManager::ProcessManager(Network::Session *session_, QWidget *parent)
   connect(session, &Network::Session::recvResponseGetProcesses, this,
           &ProcessManager::refreshCompleted);
   connect(session, &Network::Session::recvResponseTerminateProcess, this,
-          &ProcessManager::terminateCompleted);
+          &ProcessManager::onResponseTerminateProcess);
+  connect(session, &Network::Session::recvResponseStartProcess, this,
+          &ProcessManager::onResponseStartProcess);
 
   connect(this, &ProcessManager::terminatingProcess, session,
           &Network::Session::terminateProcess);
+  connect(this, &ProcessManager::startingNewProcess, session,
+          &Network::Session::startProcess);
 
   connect(ui->refresh, &QPushButton::clicked, session,
           &Network::Session::refreshProcesses);
@@ -97,7 +103,17 @@ void ProcessManager::refreshCompleted() {
   }
 }
 
-void ProcessManager::start() {}
+void ProcessManager::start() {
+  auto input = new NewProcess("path\\to\\program.exe", this);
+  auto action = input->exec();
+  if (action == QDialog::Accepted) {
+    Bridge::RequestStartProcess request(input->getPath(),
+                                        Bridge::ShowType::show);
+
+    emit startingNewProcess(request);
+  }
+  input->deleteLater();
+}
 
 void ProcessManager::terminate() {
   auto selection = ui->table->selectedItems();
@@ -113,20 +129,33 @@ void ProcessManager::terminate() {
   emit terminatingProcess(request);
 }
 
-void ProcessManager::terminateCompleted(
+void ProcessManager::onResponseTerminateProcess(
     Bridge ::HeaderPtr header,
     std ::shared_ptr<Bridge ::ResponseTerminateProcess> packet) {
   QMetaObject::invokeMethod(session, &Network::Session::refreshProcesses);
 
   QString text;
-  const auto &status = packet->processes;
+  const auto &statuses = packet->statuses;
 
-  for (const auto &process : status) {
+  for (const auto &status : statuses) {
     text.append(tr("Terminated process: %1, status: %2\n")
-                    .arg(process.pid)
-                    .arg(process.success ? "successful" : "failed"));
+                    .arg(status.pid)
+                    .arg(status.success ? "successful" : "failed"));
   }
 
   QMessageBox::information(this, tr("Terminate Completed"), text);
+}
+
+void ProcessManager::onResponseStartProcess(
+    Bridge ::HeaderPtr header,
+    std ::shared_ptr<Bridge ::ResponseStartProcess> packet) {
+  QMetaObject::invokeMethod(session, &Network::Session::refreshProcesses);
+
+  const auto &status = packet->status;
+  auto text = tr("Started process: %1, status: %2\n")
+                  .arg(QString::fromStdString(status.path))
+                  .arg(status.error_code == 0 ? "successful" : "failed");
+
+  QMessageBox::information(this, tr("Start Completed"), text);
 }
 } // namespace Window

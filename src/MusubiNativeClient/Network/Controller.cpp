@@ -1,6 +1,7 @@
 #include "Controller.hpp"
 #include "Handshake.hpp"
 #include "HeartbeatChannel.hpp"
+#include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include "Util/Util.hpp"
 #include <magic_enum.hpp>
@@ -14,6 +15,7 @@ void Controller::run() {
   REGISTER_CALLBACK(ServerHandshake, Controller);
   REGISTER_CALLBACK(RequestGetProcesses, Controller);
   REGISTER_CALLBACK(RequestTerminateProcess, Controller);
+  REGISTER_CALLBACK(RequestStartProcess, Controller);
 
   while (true) {
     auto parser = readJsonPacket();
@@ -140,6 +142,22 @@ bool Controller::onRequestTerminateProcess(const Bridge::Parser &parser) {
 
   if (ret != true) {
     spdlog::error("can not reply terminate process");
+    return false;
+  }
+
+  return true;
+}
+
+bool Controller::onRequestStartProcess(const Bridge::Parser &parser) {
+  GET_BODY(RequestStartProcess);
+
+  auto response = Util::startProcess(body);
+
+  auto ret =
+      sendJsonPacket(GENERATE_PACKET(Bridge::ResponseStartProcess, response));
+
+  if (ret != true) {
+    spdlog::error("can not reply start process");
     return false;
   }
 

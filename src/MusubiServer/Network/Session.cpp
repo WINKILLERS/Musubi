@@ -76,15 +76,6 @@ void Session::closeAllWindow() {
   windows.clear();
 }
 
-bool Session::refreshProcesses() {
-  return sendJsonPacket(GENERATE_PACKET(Bridge::RequestGetProcesses));
-}
-
-bool Session::terminateProcess(const Bridge::RequestTerminateProcess packet) {
-  return sendJsonPacket(
-      GENERATE_PACKET(Bridge::RequestTerminateProcess, packet));
-}
-
 void Session::addSubChannel(Session *sub_channel) {
   sub_channels.emplace_back(sub_channel);
   sub_channel->setParent(this);
@@ -182,6 +173,7 @@ bool Session::dispatchPacket(const Bridge::Parser &parser) const {
     CASE_AND_EMIT(Heartbeat);
     CASE_AND_EMIT(ResponseGetProcesses);
     CASE_AND_EMIT(ResponseTerminateProcess);
+    CASE_AND_EMIT(ResponseStartProcess);
   default:
     spdlog::error("packet not handled, type: {}", magic_enum::enum_name(type));
     return false;

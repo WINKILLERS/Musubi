@@ -60,6 +60,7 @@ add_full_require("libcurl")
 add_full_require("openssl")
 add_full_require("cpr")
 add_full_require("libsigcplusplus")
+add_full_require("boost")
 add_full_require("magic_enum", {shared = false, debug = false})
 
 add_dynamic_require("catch2")

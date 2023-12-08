@@ -16,6 +16,7 @@ public:
 
 signals:
   void terminatingProcess(const Bridge::RequestTerminateProcess packet);
+  void startingNewProcess(const Bridge::RequestStartProcess packet);
 
 private:
   static QString getColumnText(const ColumnItem section);
@@ -29,9 +30,8 @@ private slots:
   void refreshCompleted();
   void start();
   void terminate();
-  void terminateCompleted(
-      Bridge ::HeaderPtr header,
-      std ::shared_ptr<Bridge ::ResponseTerminateProcess> packet);
+  DECLARE_SLOT(ResponseTerminateProcess);
+  DECLARE_SLOT(ResponseStartProcess);
 };
 } // namespace Window
 #endif

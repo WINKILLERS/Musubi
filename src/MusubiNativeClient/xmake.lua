@@ -23,6 +23,7 @@ target("MusubiNativeClient")
     add_packages("magic_enum~Static")
     add_packages("fmt~Static")
     add_packages("cpr~Static")
+    add_packages("boost~Static")
     
     add_deps("MusubiBridgeStatic")
 

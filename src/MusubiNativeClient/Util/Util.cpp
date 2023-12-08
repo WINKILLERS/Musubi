@@ -1,6 +1,8 @@
 #include "Util.hpp"
 #include <TlHelp32.h>
+#include <boost/algorithm/string.hpp>
 #include <infoware/infoware.hpp>
+#include <shellapi.h>
 #include <utf8.h>
 
 #define SECURITY_WIN32
@@ -95,6 +97,66 @@ std::optional<Bridge::ResponseTerminateProcess> terminateProcess(
       response.addProcess(pid, false);
     }
   }
+
+  return response;
+}
+
+std::tuple<std::string, std::string> splitPath(const std::string &path_) {
+  std::string path = path_;
+  std::string executable;
+  std::string parameters;
+  size_t exec_end;
+  boost::trim(path);
+
+  if (path[0] == '\"') {
+    exec_end = path.find_first_of('\"', 1);
+    if (std::string::npos != exec_end) {
+      executable = path.substr(1, exec_end - 1);
+      parameters = path.substr(exec_end + 1);
+    } else {
+      executable = path.substr(1, exec_end);
+    }
+  } else {
+    exec_end = path.find_first_of(' ', 0);
+    if (std::string::npos != exec_end) {
+      executable = path.substr(0, exec_end);
+      parameters = path.substr(exec_end + 1);
+    } else {
+      executable = path.substr(0, exec_end);
+    }
+  }
+
+  return std::make_tuple(executable, parameters);
+}
+
+Bridge::ResponseStartProcess
+startProcess(const std::shared_ptr<Bridge::RequestStartProcess> packet) {
+  Bridge::ResponseStartProcess response;
+  const auto &path = packet->path;
+  auto [executable, parameters] = splitPath(path);
+  uint32_t show_type;
+
+  switch (packet->show) {
+  default:
+  case Bridge::ShowType::show:
+    show_type = SW_SHOW;
+    break;
+  case Bridge::ShowType::hide:
+    show_type = SW_HIDE;
+    break;
+  case Bridge::ShowType::maximize:
+    show_type = SW_MAXIMIZE;
+    break;
+  case Bridge::ShowType::minimize:
+    show_type = SW_MINIMIZE;
+    break;
+  }
+
+  ShellExecuteW(nullptr, L"open", utf8to16(executable).c_str(),
+                utf8to16(parameters).c_str(), nullptr, show_type);
+
+  response.status.path = packet->path;
+  response.status.error_code = GetLastError();
 
   return response;
 }

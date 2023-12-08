@@ -1,5 +1,4 @@
 #include "Logger.hpp"
-#include "qthread.h"
 
 namespace Window {
 Logger::Logger(QWidget *parent) : QTextEdit(parent) {

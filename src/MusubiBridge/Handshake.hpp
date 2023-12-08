@@ -28,7 +28,7 @@ public:
   Role role;
 
   ClientHandshake() = default;
-  ClientHandshake(const std::string &hwid_, const Role role_)
+  ClientHandshake(const std::string &hwid_, Role role_)
       : hwid(hwid_), role(role_){};
 };
 

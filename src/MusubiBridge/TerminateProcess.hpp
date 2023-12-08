@@ -26,15 +26,15 @@ class ResponseTerminateProcess : public AbstractPacket {
 public:
   IMPLEMENT_AS_PACKET(response_terminate_process);
 
-  std::vector<TerminateStatus> processes;
+  std::vector<TerminateStatus> statuses;
 
   inline void addProcess(const uint64_t &pid, bool success) {
-    processes.emplace_back(pid, success);
+    statuses.emplace_back(pid, success);
   };
 
   ResponseTerminateProcess() = default;
-  ResponseTerminateProcess(const std::vector<TerminateStatus> &processes_)
-      : processes(processes_){};
+  ResponseTerminateProcess(const std::vector<TerminateStatus> &statuses_)
+      : statuses(statuses_){};
 };
 } // namespace Bridge
 #endif

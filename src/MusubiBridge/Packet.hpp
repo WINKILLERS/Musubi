@@ -25,9 +25,11 @@ enum class Type : uint32_t {
   client_information,
   response_get_processes,
   response_terminate_process,
+  response_start_process,
   server_handshake = 512,
   request_get_processes,
   request_terminate_process,
+  request_start_process,
   max_type
 };
 

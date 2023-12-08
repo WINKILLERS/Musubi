@@ -5,6 +5,7 @@
 #include "Handshake.hpp"
 #include "Heartbeat.hpp"
 #include "Packet.hpp"
+#include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include <QAbstractSocket>
 #include <QHostAddress>
@@ -26,6 +27,14 @@
 
 #define DECLARE_SLOT(pt)                                                       \
   void on##pt(Bridge::HeaderPtr header, std::shared_ptr<Bridge::pt> packet)
+
+#define DECLARE_PACKET_SLOT(sig, type)                                         \
+  inline bool sig() { return sendJsonPacket(GENERATE_PACKET(type)); }
+
+#define DECLARE_PACKET_SLOT_WITH_PARAM(sig, type)                              \
+  inline bool sig(const type packet) {                                         \
+    return sendJsonPacket(GENERATE_PACKET(type, packet));                      \
+  }
 
 namespace Network {
 class Handler;
@@ -85,6 +94,7 @@ signals:
   DECLARE_SIGNAL(Heartbeat);
   DECLARE_SIGNAL(ResponseGetProcesses);
   DECLARE_SIGNAL(ResponseTerminateProcess);
+  DECLARE_SIGNAL(ResponseStartProcess);
 
 public slots:
   bool sendJsonPacket(const Bridge::AbstractGenerator &packet);
@@ -93,8 +103,10 @@ public slots:
 
   void closeAllWindow();
 
-  bool refreshProcesses();
-  bool terminateProcess(const Bridge::RequestTerminateProcess packet);
+  DECLARE_PACKET_SLOT(refreshProcesses, Bridge::RequestGetProcesses);
+  DECLARE_PACKET_SLOT_WITH_PARAM(terminateProcess,
+                                 Bridge::RequestTerminateProcess);
+  DECLARE_PACKET_SLOT_WITH_PARAM(startProcess, Bridge::RequestStartProcess);
 
 private:
   // Called from handler when a sub channel connected

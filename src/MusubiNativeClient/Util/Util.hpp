@@ -2,6 +2,7 @@
 #define UTIL_HPP
 #include "GetProcesses.hpp"
 #include "Handshake.hpp"
+#include "StartProcess.hpp"
 #include "TerminateProcess.hpp"
 #include <Windows.h>
 #include <memory>
@@ -16,5 +17,7 @@ Bridge::ClientInformation getInformation();
 std::optional<Bridge::ResponseGetProcesses> getProcesses();
 std::optional<Bridge::ResponseTerminateProcess>
 terminateProcess(const std::shared_ptr<Bridge::RequestTerminateProcess> packet);
+Bridge::ResponseStartProcess
+startProcess(const std::shared_ptr<Bridge::RequestStartProcess> packet);
 } // namespace Util
 #endif
