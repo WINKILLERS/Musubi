@@ -6,3 +6,6 @@ build/
 
 # Vscode cache
 .vscode/.cache/
+
+# Doxygen
+doc/

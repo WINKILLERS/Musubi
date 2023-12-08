@@ -15,6 +15,11 @@
   inline Type getType() const override { return (Type)PacketType; };
 
 namespace Bridge {
+/**
+ * @brief Get the Bridge version
+ *
+ * @return uint64_t
+ */
 uint64_t getBridgeVersion();
 
 enum class Type : uint32_t {
@@ -26,10 +31,12 @@ enum class Type : uint32_t {
   response_get_processes,
   response_terminate_process,
   response_start_process,
+  response_get_files,
   server_handshake = 512,
   request_get_processes,
   request_terminate_process,
   request_start_process,
+  request_get_files,
   max_type
 };
 
@@ -43,13 +50,25 @@ enum class Role : uint8_t { unknown, controller, heartbeat };
 
 class AbstractPacket {
 public:
-  // Build the json packet
+  /**
+   * @brief Build the packet in json format
+   *
+   * @return std::string
+   */
   virtual std::string buildJson() const;
 
-  // Parse a json, throw exception on error
+  /**
+   * @brief Parse a json, throw exception on error
+   *
+   * @param json Packet content in json type
+   */
   virtual void parseJson(const std::string &json);
 
-  // Get packet's type
+  /**
+   * @brief Get packet's type
+   *
+   * @return Type
+   */
   virtual inline Type getType() const = 0;
 };
 
