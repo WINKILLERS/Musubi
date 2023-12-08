@@ -45,14 +45,38 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionAbout"/>
+    <addaction name="actionLicense"/>
+   </widget>
+   <widget class="QMenu" name="menuControl">
+    <property name="title">
+     <string>Control</string>
+    </property>
+    <addaction name="actionView_Information"/>
+    <addaction name="actionProcess_Manager"/>
+    <addaction name="actionFile_Manager"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuControl"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionAbout">
+  <action name="actionLicense">
    <property name="text">
-    <string>About</string>
+    <string>License</string>
+   </property>
+  </action>
+  <action name="actionProcess_Manager">
+   <property name="text">
+    <string>Process Manager</string>
+   </property>
+  </action>
+  <action name="actionFile_Manager">
+   <property name="text">
+    <string>File Manager</string>
+   </property>
+  </action>
+  <action name="actionView_Information">
+   <property name="text">
+    <string>View Information</string>
    </property>
   </action>
  </widget>

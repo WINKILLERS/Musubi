@@ -1,21 +1,21 @@
 #ifndef VIEW_ABOUT_ACTION_HPP
 #define VIEW_ABOUT_ACTION_HPP
-#include "Window/About/About.hpp"
+#include "Window/License/License.hpp"
 #include <QAction>
 
 namespace Widget {
-class ViewAbout : public QAction {
+class ViewLicense : public QAction {
   Q_OBJECT;
 
 public:
-  explicit ViewAbout(QObject *parent = nullptr);
-  ~ViewAbout();
+  explicit ViewLicense(QObject *parent = nullptr);
+  ~ViewLicense();
 
 public slots:
   void onTriggered();
 
 private:
-  Window::About *window;
+  Window::License *window;
 };
 } // namespace Widget
 #endif

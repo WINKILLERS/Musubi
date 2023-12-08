@@ -4,7 +4,8 @@
     </qresource>
     <qresource prefix="/Widget">
         <file>Widget/Actions/ViewClientInfo/ViewClientInfo.png</file>
-        <file>Widget/Actions/ViewAbout/ViewAbout.png</file>
         <file>Widget/Actions/ViewProcesses/ViewProcesses.png</file>
+        <file>Widget/Actions/ViewFiles/ViewFiles.png</file>
+        <file>Widget/Actions/ViewLicense/ViewLicense.png</file>
     </qresource>
 </RCC>
