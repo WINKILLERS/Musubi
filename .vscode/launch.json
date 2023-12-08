@@ -19,6 +19,14 @@
             "target": "MusubiServer",
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false
+        },
+        {
+            "type": "xmake",
+            "request": "launch",
+            "name": "Debug MusubiNativeClient",
+            "target": "MusubiNativeClient",
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false
         }
     ]
 }

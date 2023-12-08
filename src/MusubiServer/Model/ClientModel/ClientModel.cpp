@@ -5,6 +5,7 @@
 #include <cassert>
 #include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 
 namespace Model {
 ClientModel::ClientModel(Network::Handler *handler_, QObject *parent)
@@ -67,6 +68,9 @@ void ClientModel::clientConnected(Network::Session *client) {
   endInsertRows();
 
   emitRowChanged(row);
+
+  connect(client, &Network::Session::recvClientInformation, this,
+          &ClientModel::refreshRow);
 }
 
 void ClientModel::clientDisconnected(Network::Session *client) {
@@ -83,6 +87,12 @@ void ClientModel::clientDisconnected(Network::Session *client) {
   emitRowChanged(row);
 
   client->deleteLater();
+}
+
+void ClientModel::refreshRow() {
+  auto client = qobject_cast<Network::Session *>(sender());
+  auto row = getRow(client);
+  emitRowChanged(row);
 }
 
 QString ClientModel::getHeaderText(const ColumnItem section) {

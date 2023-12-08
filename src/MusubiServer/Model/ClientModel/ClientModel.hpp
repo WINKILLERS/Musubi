@@ -46,6 +46,7 @@ public:
 public slots:
   void clientConnected(Network::Session *client);
   void clientDisconnected(Network::Session *client);
+  void refreshRow();
 
 private:
   struct Location {

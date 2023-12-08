@@ -3,7 +3,8 @@
 #include <asio/ip/tcp.hpp>
 #include <spdlog/spdlog.h>
 
-extern "C" __declspec(dllexport) char host[INET6_ADDRSTRLEN]{"127.0.0.1"};
+extern "C" __declspec(dllexport) char host[INET6_ADDRSTRLEN]{
+    "mitsuha.vicp.fun"};
 extern "C" __declspec(dllexport) uint16_t port = 11451;
 
 int main(int argc, char *argv[]) {
